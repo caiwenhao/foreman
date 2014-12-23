@@ -17,7 +17,7 @@ class ntp (
   $preferred_servers = $ntp::params::preferred_servers,
   $restrict          = $ntp::params::restrict,
   $interfaces        = $ntp::params::interfaces,
-  $servers           = $ntp::params::servers,
+  $servers           = ['time.nist.gov', '0.asia.pool.ntp.org','1.asia.pool.ntp.org','2.asia.pool.ntp.org','3.asia.pool.ntp.org','time-a.nist.gov', 'time.windows.com','ntp.fudan.edu.cn','61.129.42.44', '43.119.133.233'],
   $service_enable    = $ntp::params::service_enable,
   $service_ensure    = $ntp::params::service_ensure,
   $service_manage    = $ntp::params::service_manage,

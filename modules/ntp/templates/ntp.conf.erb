@@ -41,6 +41,7 @@ restrict 127.127.1.0
 
 # Driftfile.
 driftfile <%= @driftfile %>
+disable monitor
 
 <% unless @logfile.nil? -%>
 # Logfile
