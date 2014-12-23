@@ -73,6 +73,7 @@ class timezone (
 
   package { $timezone::params::package:
     ensure => $package_ensure,
+    allow_virtual => false,
   }
 
   if $timezone::params::timezone_file != false {

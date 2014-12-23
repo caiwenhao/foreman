@@ -24,6 +24,7 @@ class selinux::config(
 
   package { 'libselinux-utils':
     ensure => present,
+    allow_virtual => false,
   }
 
   file { '/etc/selinux/config':

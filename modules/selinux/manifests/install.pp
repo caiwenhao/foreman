@@ -10,6 +10,7 @@ class selinux::install {
   if $selinux::installmake {
     package { 'make':
       ensure => present,
+      allow_virtual => false,
     }
   }
 }

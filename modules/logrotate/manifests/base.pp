@@ -6,6 +6,7 @@
 class logrotate::base {
   package { 'logrotate':
     ensure => latest,
+    allow_virtual => false,
   }
 
   File {
