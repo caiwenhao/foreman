@@ -44,7 +44,7 @@
 # [Remember: No empty lines between comments and class definition]
 class timezone (
   $ensure = 'present',
-  $timezone = 'UTC',
+  $timezone = 'Asia/Shanghai',
   $autoupgrade = false
 ) inherits timezone::params {
 
