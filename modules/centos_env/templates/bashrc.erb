@@ -1,0 +1,10 @@
+# .bashrc
+# User specific aliases and functions
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+. /etc/bashrc
+fi
+export LANG=en_US.UTF-8
+export PS1='[\u@<%= @ps1 %> \W]\$ '
+export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin:/usr/local/bin
+

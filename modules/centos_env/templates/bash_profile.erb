@@ -1,0 +1,122 @@
+# .bash_profile
+
+# Get the aliases and functions
+if [ -f ~/.bashrc ]; then
+. ~/.bashrc
+fi
+
+# User specific environment and startup programs
+
+PATH=$PATH:$HOME/bin
+
+export PATH
+unset USERNAME
+
+#实时记录历史命令
+shopt -s histappend
+PROMPT_COMMAND='history -a'
+
+alias vi='vim'
+alias cp='cp -i'
+alias mv='mv -i'
+alias rz='rz -bey'
+alias grep='grep --colour=always'
+alias rm='''echo -e "\033[40;32;1m【运维温馨提示】\033[0m \033[40;31;1;5m请不要轻易运行危险命令！\033[0m \033[40;33;1m rm \033[0m "'''
+alias shutdown='''echo -e "\033[40;32;1m【运维温馨提示】\033[0m \033[40;31;1;5m请不要轻易运行危险命令！\033[0m \033[40;33;1m shutdown \033[0m"'''
+alias init='''echo -e "\033[40;32;1m【运维温馨提示】\033[0m \033[40;31;1;5m请不要轻易运行危险命令！\033[0m \033[40;33;1m init \033[0m"'''
+alias reboot='''echo -e "\033[40;32;1m【运维温馨提示】\033[0m \033[40;31;1;5m请不要轻易运行危险命令！\033[0m \033[40;33;1m reboot \033[0m"'''
+alias halt='''echo -e "\033[40;32;1m【运维温馨提示】\033[0m \033[40;31;1;5m请不要轻易运行危险命令！\033[0m \033[40;33;1m halt \033[0m"'''
+alias poweroff='''echo -e "\033[40;32;1m【运维温馨提示】\033[0m \033[40;31;1;5m请不要轻易运行危险命令！\033[0m \033[40;33;1m poweroff \033[0m"'''
+alias pkill='''echo -e "\033[40;32;1m【运维温馨提示】\033[0m \033[40;31;1;5m请不要轻易运行危险命令！\033[0m \033[40;33;1m pkill \033[0m"'''
+alias killall='''echo -e "\033[40;32;1m【运维温馨提示】\033[0m \033[40;31;1;5m请不要轻易运行危险命令！\033[0m \033[40;33;1m killall \033[0m"'''
+alias kill='''echo -e "\033[40;32;1m【运维温馨提示】\033[0m \033[40;31;1;5m请不要轻易运行危险命令！\033[0m \033[40;33;1m kill \033[0m"'''
+alias chgrp='chgrp --preserve-root'
+alias chown='chown --preserve-root'
+alias chmod='chmod --preserve-root'
+export MYSQL_PS1="\R:\m:\s\P>\_"
+
+project_name=$(awk -F'@|_' '/PS1=/ {print $2}' /root/.bashrc)
+
+usage_ming(){
+COMMAND_LIST="online_date online_num games_installed con_mysql mysql_root_pw genpasswd"
+for i in ${COMMAND_LIST}
+do
+echo -e "\033[32;49;1m$i\033[39;49;0m"
+done
+echo 'Please type "cat /root/.bash_profile" for more infomation'
+}
+
+online_date(){
+for i in $(ls /data | sed -n "/${project_name}_[0-9a-z]\{1,\}_[0-9]\{1,\}/p" | sort -t_ -k 2,2 -k 3,3n)
+do
+local AGENT="$(echo ${i} | awk -F'_' '{print $2}')"
+local SID="$(echo ${i} | awk -F'_' '{print $3}')"
+ONLINE_DATE=`awk -v FS=', *{ *{ *| *} *, *{ *| *} *} *} *. *' '/server_start_datetime/{gsub(/,/,"-",$2);gsub(/,/,":",$3);print $2,$3}' /data/${i}/server/setting/common.config`
+echo "${AGENT} ${SID}: ${ONLINE_DATE}"
+done
+}
+
+online_num(){
+ONLINE_SUM=0
+REG_NUM=""
+for i in $(ls /data | sed -n "/${project_name}_[0-9a-z]\{1,\}_[0-9]\{1,\}/p" | sort -t_ -k 2,2 -k 3,3n)
+do
+local AGENT="$(echo ${i} | awk -F'_' '{print $2}')"
+local SID="$(echo ${i} | awk -F'_' '{print $3}')"
+ONLINE_NUM=`/data/${i}/server/mgectl online`
+if [ $# -eq 2 ]
+then
+REG_NUM=`/data/${i}/server/mgectl reg`
+fi
+if [ ! $# -lt 1 ]
+then
+echo "${AGENT}_${SID}:${ONLINE_NUM} ${REG_NUM}"
+fi
+ONLINE_SUM=$((${ONLINE_SUM}+${ONLINE_NUM}))
+done
+echo ${ONLINE_SUM}
+}
+
+games_installed(){
+if [ -d /data/${project_name}/ ]
+then
+admin=$(ls /data/${project_name}/ | sed -n '/web_/p')
+if [ ! -z "${admin}" ]
+then
+echo -e "\033[0;31;1m已安装代理后台：\033[0m"
+ALL_SERVERS=$(for i in ${admin}
+do
+local AGENT="$(echo ${i} | awk -F'_' '{print $2}')"
+echo -e "${AGENT}"
+done)
+FORMAT_ALL_SERVERS=$(echo "${ALL_SERVERS}"|column -c 100 )
+echo -e "\033[0;32;1m${FORMAT_ALL_SERVERS}\033[0m"
+fi
+fi
+games=$(ls /data | sed -n "/${project_name}_[0-9a-z]\{1,\}_[0-9]\{1,\}/p" | sort -t_ -k 2,2 -k 3,3n)
+if [ ! -z "${games}" ]
+then
+echo -e "\033[0;31;1m当前机器上已安装$(echo ${games}|wc -w)个区服：\033[0m"
+game_list=$(ls /data | sed -n "/${project_name}_[0-9a-z]\{1,\}_[0-9]\{1,\}/p" | sort -t_ -k 2,2 -k 3,3n|awk -F "_" '{if($2==x){i=i","$3}else{if(NR>1){print i};if(length($2)>=8){i=$2"\t|\t"$3}else{i=$2"\t\t|\t"$3}}x=$2;y=$3}END{print i}')
+echo -e "\033[0;32;1m代理\t\t|\t区服\033[0m"
+info_s="$(echo "" | sed ':a; s/^/-/; /-\{60\}/b; ta')"
+echo -e "\033[0;32;1m${info_s}\033[0m"
+echo -e "\033[0;32;1m${game_list}\033[0m"
+echo -e "\033[0;32;1m${info_s}\033[0m"
+fi
+}
+games_installed
+
+con_mysql(){
+mysql -uroot -p$(cat /data/save/mysql_root)
+}
+
+mysql_root_pw(){
+cat /data/save/mysql_root
+}
+
+genpasswd(){
+local l=$1
+[ "$l" == "" ] && l=16
+tr -dc A-Za-z0-9_ < /dev/urandom | head -c ${l} | xargs
+}
