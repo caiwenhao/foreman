@@ -17,6 +17,7 @@ class ntp (
   $preferred_servers = $ntp::params::preferred_servers,
   $restrict          = $ntp::params::restrict,
   $interfaces        = $ntp::params::interfaces,
+  $first_servers    = "cn.pool.ntp.org",
   $servers           = ['time.nist.gov', '0.asia.pool.ntp.org','1.asia.pool.ntp.org','2.asia.pool.ntp.org','3.asia.pool.ntp.org','time-a.nist.gov', 'time.windows.com','ntp.fudan.edu.cn','61.129.42.44', '43.119.133.233'],
   $service_enable    = $ntp::params::service_enable,
   $service_ensure    = $ntp::params::service_ensure,
@@ -58,6 +59,7 @@ class ntp (
   anchor { 'ntp::begin': } ->
   class { '::ntp::install': } ->
   class { '::ntp::config': } ~>
+  class {'::ntp::systohc':}  ~>
   class { '::ntp::service': } ->
   anchor { 'ntp::end': }
 
