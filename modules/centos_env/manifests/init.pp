@@ -2,6 +2,8 @@ class centos_env(
   $ps1 = "cwh_puppet_agent_192.168.137.3_61618_A",
 ){
   include 'centos_env::sysctl'
+  include 'centos_env::repo'
+  include 'centos_env::ssh'
 #设置终端环境语言
   augeas {"i18n" :
     context => "/files/etc/sysconfig/i18n",
