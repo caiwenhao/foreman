@@ -1,18 +1,14 @@
 class centos_env::firewall(){
-  resources { "firewall":purge => true}
   Firewall {
     require => undef,
   }
   firewallchain { 'INPUT:filter:IPv4':
-    purge  => true,
     policy => 'drop',
   }
   firewallchain { 'FORWARD:filter:IPv4':
-    purge  => true,
     policy => 'drop',
   }
   firewallchain { 'OUTPUT:filter:IPv4':
-    purge  => true,
     policy => 'accept',
   }
   firewall { '001 accept all to lo interface':
