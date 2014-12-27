@@ -1,0 +1,51 @@
+user www www;
+worker_processes <%= @processorcount %>;
+worker_rlimit_nofile 65535;
+
+pid        /var/run/nginx.pid;
+error_log  /var/log/nginx/error.log crit;
+
+events {
+    worker_connections 51200;
+    multi_accept on;
+    use epoll;
+}
+
+http {
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+    access_log  off;
+    sendfile    on;
+    tcp_nopush on;
+    server_tokens off;
+    server_names_hash_bucket_size 128;
+    keepalive_timeout  60;
+    tcp_nodelay        on;
+
+    fastcgi_buffer_size          64k;
+    fastcgi_buffers              4 64k;
+    fastcgi_busy_buffers_size    128k;
+    fastcgi_connect_timeout      180;
+    fastcgi_read_timeout         600;
+    fastcgi_send_timeout         600;
+    fastcgi_temp_file_write_size 128k;
+    fastcgi_temp_path            /dev/shm;
+
+    server
+    {
+        listen 80;
+        server_name empty;
+        root /data/web/webclose;
+    }
+    server {
+        listen 80;
+        server_name 127.0.0.1 ;
+        access_log off;
+        allow 127.0.0.1;
+        deny all;
+        location /nginx-status { stub_status on;}
+    }
+    #include conf.d/*.conf;
+    include vhost/*.conf;
+    include block_ips.conf ;
+}

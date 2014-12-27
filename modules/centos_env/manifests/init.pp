@@ -22,6 +22,16 @@ class centos_env(
     ensure  => file,
     content => template("centos_env/bash_profile.erb"),
   }
+ #创建www用户
+  user {"www":
+    ensure => "present",
+    shell  => "/sbin/nologin",
+    groups => www,
+  }
+  group {"www":
+    ensure => "present",
+  }
+  
 #创建必要的目录
   centos_env::lib::mkdir_p { "/data/database": }
   file {'database':
