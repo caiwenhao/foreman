@@ -36,7 +36,7 @@ class nginx(
     purge => true,
     force  => true,
     recurse => true,
-    ignore => ["vhost","nginx.conf"],
+    ignore => ['vhost','nginx.conf','client_body_temp','scgi_temp','uwsgi_temp','proxy_temp'],
   }
   file {"/data/conf/nginx/vhost":
     ensure  => directory,
