@@ -1,0 +1,87 @@
+[client]
+port = 3306
+socket = /var/lib/mysql/mysql.sock
+
+[isamchk]
+key_buffer = 1M
+key_buffer_size = 16M
+read_buffer = 2M
+sort_buffer_size = 1M
+write_buffer = 2M
+
+[myisamchk]
+key_buffer = 1M
+read_buffer = 2M
+sort_buffer_size = 1M
+write_buffer = 2M
+
+[mysql]
+auto-rehash
+
+[mysqld]
+###base options
+basedir = /usr/local/mysql
+datadir = /usr/local/mysql/var
+pid-file = /var/lib/mysql/mysqld.pid
+socket = /var/lib/mysql/mysql.sock
+log-error = /usr/local/mysql/data/mysqld.log
+tmpdir = /tmp
+open_files_limit = 65535
+bind-address = 0.0.0.0
+port = 3306
+default-storage-engine = INNODB
+user = mysql
+back_log = 512
+max_connections = 1024
+#max_prepared_stmt_count=500000
+#max_connect_errors = 10
+table_open_cache = 2048
+max_allowed_packet = 16M
+expire_logs_days = 10
+binlog_cache_size = 16M
+max_binlog_size = 100M
+sort_buffer_size = 8M
+join_buffer_size = 8M
+thread_cache_size = 300
+query_cache_limit = 2M
+query_cache_size = 128M
+tmp_table_size = 246M
+thread_stack = 256K
+
+###innnodb options
+innodb_open_files = 20480
+innodb_file_per_table = true
+innodb_data_file_path = ibdata1:100M:autoextend
+innodb_flush_method = O_DIRECT
+innodb_log_buffer_size = 16M
+innodb_log_file_size = 512M
+innodb_log_files_in_group = 2
+innodb_buffer_pool_size = 125M
+innodb_buffer_pool_restore_at_startup = 600
+innodb_blocking_buffer_pool_restore = 1
+innodb_flush_log_at_trx_commit = 2
+
+###innnodb plugin options
+innodb_read_io_threads = 16
+innodb_write_io_threads = 16
+innodb_io_capacity = 600
+
+###myisam options
+skip-external-locking
+key_buffer_size = 16M
+read_buffer_size = 4M
+read_rnd_buffer_size = 4M
+myisam_recover_options = BACKUP
+myisam_sort_buffer_size = 16M
+myisam_repair_threads = 1
+bulk_insert_buffer_size =16M
+
+[mysqld_safe]
+err-log = /usr/local/mysql/data/mysqld.log
+nice = 0
+socket = /var/lib/mysql/mysql.sock
+
+[mysqldump]
+max_allowed_packet = 16M
+quick
+quote-names
