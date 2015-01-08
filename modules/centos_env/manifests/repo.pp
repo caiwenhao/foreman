@@ -12,7 +12,25 @@ class centos_env::repo(){
     allow_virtual  => false,
   }
   $common_package = [
-    "curl",
     "dos2unix",
+    "libxml2-devel",
+    "openssl",
+    "openssl-devel",
+    "bzip2",
+    "bzip2-devel",
+    "curl",
+    "libcurl-devel",
+    "libpng",
+    "libpng-devel",
+    "freetype-devel",
+    "libmcrypt",
+    "libmcrypt-devel",
+    "libjpeg-turbo",
   ]
+  package { $common_package:
+    ensure         => installed,
+    require        => Yumrepo["mcyw"],
+    allow_virtual  => false,
+  }
+
 }

@@ -2,15 +2,15 @@ class mysql(
   $mysql_package = "mysql-5.5.40-1.el6.x86_64"
 ){
   file { '/root/mysql_start':
-    content => '/sbin/service mysql start',
+    content => "/sbin/service mysql start\n",
     mode    => '700',
   }
   file { '/root/mysql_stop':
-    content => '/sbin/service mysql stop',
+    content => "/sbin/service mysql stop\n",
     mode    => '700',
   }
   file { '/root/mysql_processlist':
-    content => "mysql -uroot -p`cat /data/save/mysql_root` -e 'SHOW processlist;",
+    content => "mysql -uroot -p`cat /data/save/mysql_root` -e 'SHOW processlist;'\n",
     mode    => '700',
   }
   file { "mysql_cnf":
