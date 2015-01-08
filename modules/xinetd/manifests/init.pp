@@ -43,6 +43,7 @@ class xinetd (
   package { $package_name:
     ensure => installed,
     before => Service[$service_name],
+    allow_virtual  => false,
   }
 
   service { $service_name:

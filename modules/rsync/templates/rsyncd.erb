@@ -1,0 +1,21 @@
+secrets file = /etc/rsyncd.secrets
+motd file = /etc/rsyncd.motd
+read only = yes
+list = no
+uid = root
+gid = wheel
+hosts allow = 113.107.160.72 121.10.139.59 113.107.180.116 112.90.25.116 192.168.11.0/24
+max connections = 20
+log file = /var/log/rsyncd.log
+pid file = /var/run/rsyncd.pid
+lock file = /var/run/rsync.lock
+
+################################################
+[mingchao_file_db]
+path = /data/backup/all_backup/
+include=*.tar.bz2
+include=*.tar.gz
+include=*.log
+auth users = rsy_user
+
+################################################
