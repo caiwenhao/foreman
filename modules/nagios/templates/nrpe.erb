@@ -1,0 +1,57 @@
+# LOG FACILITY
+log_facility=daemon
+
+
+# PID FILE
+pid_file=/var/run/nrpe.pid
+
+
+# PORT NUMBER
+server_port=<%= nagios_port %>
+
+
+# NRPE USER
+nrpe_user=nagios
+
+
+# NRPE GROUP
+nrpe_group=nagios
+
+command_prefix=/usr/bin/sudo
+
+# ALLOWED HOST ADDRESSES
+allowed_hosts=127.0.0.1,<%= nagios_server %>
+ 
+
+# COMMAND ARGUMENT PROCESSING
+dont_blame_nrpe=0
+
+
+# DEBUGGING OPTION
+# Values: 0=debugging off, 1=debugging on
+debug=0
+
+
+# COMMAND TIMEOUT
+command_timeout=60
+
+
+# CONNECTION TIMEOUT
+connection_timeout=300
+
+
+# COMMAND DEFINITIONS
+command[check_disk]=/usr/local/nagios/libexec/check_disk -x /boot -x /dev/shm -w 20% -c 10%
+command[check_load]=/usr/local/nagios/libexec/check_load -w 25,20,15 -c 30,25,20
+command[check_mysql]=/usr/local/nagios/libexec/check_mysql_health --socket=/tmp/mysql.sock --mode=threads-connected --username=root --password="SEsVdniaIOMH5THi_M3b" --port 3306 --warning=400 --critical 500
+command[check_http]=/usr/local/nagios/libexec/check_http -H  -u  /crossdomain.xml -w 5 -c 10
+command[check_ntp]=/usr/local/nagios/libexec/check_ntp_time -H 127.0.0.1 -w 3 -c 5
+command[check_iptables]=/usr/local/nagios/libexec/check_iptables
+command[check_ssh_log]=/usr/local/nagios/libexec/check_ssh_log
+command[check_tcp_9998]=/usr/local/nagios/libexec/check_tcp -p 9998
+command[check_tcp_9999]=/usr/local/nagios/libexec/check_tcp -p 9999
+command[check_tcp_11210]=/usr/local/nagios/libexec/check_tcp -p 11210
+command[check_tcp_11211]=/usr/local/nagios/libexec/check_tcp -p 11211
+command[check_crond_status]=/usr/local/nagios/libexec/check_crond_status
+command[check_disk_health]=/usr/local/nagios/libexec/check_disk_health
+command[check_raid]=/usr/local/nagios/libexec/check_raid

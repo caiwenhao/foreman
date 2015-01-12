@@ -26,6 +26,7 @@ class centos_env::repo(){
     "libmcrypt",
     "libmcrypt-devel",
     "libjpeg-turbo",
+    "sudo",
   ]
   package { $common_package:
     ensure         => installed,
