@@ -1,0 +1,23 @@
+PidFile=/var/run/zabbix_agentd.pid
+LogFile=/data/logs/zabbix/zabbix_agentd.log
+LogFileSize=100
+DebugLevel=3
+EnableRemoteCommands=1
+LogRemoteCommands=1
+##### Passive checks related
+Server=<%= zabbix_center %>,<%= proxy_list %>
+ListenPort=<%= listen_port %>
+StartAgents=5
+##### Active checks related
+ServerActive=<%= proxy_list %>:<%= server_port %>
+Hostname=<%= zabbix_hostname %>
+RefreshActiveChecks=120
+BufferSend=30
+BufferSize=100
+MaxLinesPerSecond=100
+############ ADVANCED PARAMETERS #################
+Timeout=30
+AllowRoot=1
+####### USER-DEFINED MONITORED PARAMETERS #######
+UnsafeUserParameters=1
+UserParameter=mc.py[*],/usr/bin/python /usr/local/zabbix/sbin/zabbix_agentd.py -m $1 $2 $3 $4

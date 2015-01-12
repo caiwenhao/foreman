@@ -40,9 +40,8 @@ class centos_env(
     require => Centos_env::Lib::Mkdir_p["/data/database"],
   }
   centos_env::lib::mkdir_p { "/data/logs": }
-  file {'logs':
+  file {'/data/logs':
     ensure => directory,
-    path    => "/data/logs",
     require => Centos_env::Lib::Mkdir_p["/data/logs"],
   }
   centos_env::lib::mkdir_p { "/data/backup/tmp": }
