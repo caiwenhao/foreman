@@ -40,6 +40,11 @@ class rsync(
     target => "/data/conf/rsync/rsyncd.secrets",
     require => File['/data/conf/rsync'],
   }
+  firewall { '100 for Master_Backup':
+    action  => 'accept',
+    proto   => 'all',
+    source  => '113.107.160.72',
+  }
   include xinetd
   xinetd::service { 'rsync':
     bind        => '0.0.0.0',
