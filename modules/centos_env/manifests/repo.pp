@@ -45,7 +45,15 @@ class centos_env::repo(){
     "mlocate",
     "unrar",
   ]
-
+  $performance_tools = [
+    "innotop",
+    "iftop",
+    "iotop",
+    "lsof",
+    "vnstat",
+    "sysstat",
+    "dstat",
+  ]
   package { $common_package:
     ensure         => installed,
     require        => Yumrepo["mcyw"],
@@ -61,5 +69,9 @@ class centos_env::repo(){
     require        => Yumrepo["mcyw"],
     allow_virtual  => false,
   }
-
+  package { $performance_tools:
+    ensure         => installed,
+    require        => Yumrepo["mcyw"],
+    allow_virtual  => false,
+  }
 }
