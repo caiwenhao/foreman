@@ -1,6 +1,6 @@
 class centos_env::repo(){
   yumrepo { 'mcyw':
-    baseurl        => "http://192.168.137.2:8080/centos/6.2/x86_64",
+    baseurl        => "http://foreman.mcyw.mingchaoonline.com:8080/centos/6.2/x86_64",
     enabled        => "1",
     gpgcheck       => "0",
     descr          => "mcyw centos",
@@ -27,6 +27,13 @@ class centos_env::repo(){
     "libmcrypt-devel",
     "libjpeg-turbo",
     "sudo",
+  ]
+  $network_tools = [
+    "traceroute",
+    "telnet",
+    "bind",
+    "bind-libs",
+    "bind-utils",
   ]
   package { $common_package:
     ensure         => installed,
