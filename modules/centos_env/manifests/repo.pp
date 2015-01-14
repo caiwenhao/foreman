@@ -35,7 +35,28 @@ class centos_env::repo(){
     "bind-libs",
     "bind-utils",
   ]
+  $system_tools = [
+    "tree",
+    "screen",
+    "vim-common",
+    "vim-enhanced",
+    "at",
+    "lrzsz",
+    "mlocate",
+    "unrar",
+  ]
+
   package { $common_package:
+    ensure         => installed,
+    require        => Yumrepo["mcyw"],
+    allow_virtual  => false,
+  }
+  package { $network_tools:
+    ensure         => installed,
+    require        => Yumrepo["mcyw"],
+    allow_virtual  => false,
+  }
+  package { $system_tools:
     ensure         => installed,
     require        => Yumrepo["mcyw"],
     allow_virtual  => false,
