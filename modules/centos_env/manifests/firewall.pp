@@ -1,7 +1,4 @@
 class centos_env::firewall(){
-  Firewall {
-    require => undef,
-  }
   firewallchain { 'INPUT:filter:IPv4':
     policy => 'drop',
   }

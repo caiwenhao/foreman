@@ -5,7 +5,7 @@
 #   include logrotate::base
 class logrotate::base {
   package { 'logrotate':
-    ensure => "logrotate-3.7.8-17.el6.x86_64",
+    ensure        =>"present" ,
     allow_virtual => false,
   }
 
