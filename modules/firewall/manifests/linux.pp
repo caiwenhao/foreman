@@ -22,8 +22,7 @@ class firewall::linux (
   }
 
   package { 'iptables':
-    ensure         => present,
-    allow_virtual  => false,
+    ensure => present,
   }
 
   case $::operatingsystem {

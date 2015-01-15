@@ -27,6 +27,7 @@ class zabbix(
     content => template('zabbix/zabbix_agentd.erb'),
     path => "/usr/local/zabbix/etc/zabbix_agentd.conf",
     require => Package["$zbbix_package"],
+    notify => Service['zabbix_agentd']
   }
   firewall { "$listen_port for zabbix_agentd":
     action => 'accept',

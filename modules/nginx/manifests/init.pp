@@ -68,6 +68,11 @@ class nginx(
     require => Package['nginx'],
     before  => Service['nginx'],
   }
+  firewall { "80 for nginx":
+    action => 'accept',
+    dport  => "80",
+    proto  => 'tcp',
+  }
   service { 'nginx':
     ensure     => "running",
     enable     => true,
