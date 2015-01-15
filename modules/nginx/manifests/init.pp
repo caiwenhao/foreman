@@ -15,7 +15,7 @@ class nginx(
     mode    => '700',
   }
   file {"/root/nginx_reload":
-    content => $service_reload,
+    content => "/etc/init.d/nginx configtest\n$service_reload\n",
     mode    => '700',
   }
   file {"/root/nginx_stop":
