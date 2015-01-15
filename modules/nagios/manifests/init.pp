@@ -50,9 +50,5 @@ class nagios(
     hasrestart => true,
     require    => File['nrpe.cfg'],
     path       => "/etc/init.d",
-    provider   => init,
-    restart    => "/etc/init.d/nrpe reload",
-    start      => "/etc/init.d/nrpe start",
-    stop       => "/etc/init.d/nrpe stop",
   }
 }

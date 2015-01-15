@@ -46,9 +46,5 @@ class zabbix(
     hasrestart => true,
     require    => File['zabbix_agentd.conf'],
     path       => "/etc/init.d",
-    provider   => init,
-    restart    => "/etc/init.d/zabbix_agentd reload",
-    start      => "/etc/init.d/zabbix_agentd start",
-    stop       => "/etc/init.d/zabbix_agentd stop",
   }
 }
