@@ -27,6 +27,7 @@ class centos_env::repo(){
     "libmcrypt-devel",
     "libjpeg-turbo",
     "sudo",
+    "crontabs",
   ]
   $network_tools = [
     "traceroute",

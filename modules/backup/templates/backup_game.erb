@@ -1,0 +1,156 @@
+#!/bin/bash
+################################################
+#每隔3小时备份一次游戏数据，循环对所有服进行备份
+#用inotifywait进行监控，当一个服备份文件关闭时，
+#才进行下一个服的备份
+################################################
+
+#定义时间点函数，因为是循环备份，如果服多的话，
+#备份跨度会超过1个小时，所以用函数来取备份发生
+#时的时间点
+CHECK_Y=`date +%Y`
+CHECK_M=`date +%-m`
+CHECK_D=`date +%-d`
+
+CHECK_H(){
+echo "`date +%-H`"
+}
+###20140722-kk###
+PRO_NAME='<%= @project_name %>'
+SERVER_IP=`/sbin/ifconfig | grep "inet addr" | awk '{print $2}' | sed -e "s/.*://"|/bin/grep -Ev "192.168|^10.|^172.16.|^127.0"|head -1`
+LOG_FILE="/tmp/<%= @project_name %>_backup_${CHECK_Y}${CHECK_M}${CHECK_D}.$(CHECK_H).log"
+###20140722-kk###
+
+#取消六点的备份
+if [ $(CHECK_H) -eq 6 ]
+then
+exit 1
+fi
+
+#取消0点备份延迟一个小时
+if [ $(CHECK_H) -eq 0 ]
+then
+sleep 3600
+fi
+
+Y_DAY=`date -d -24hour +%-d`
+Y_MONTH=`date -d -31day +%-m`
+BACKUP_DIR="/data/backup/database/"
+mkdir -p ${BACKUP_DIR}
+cd ${BACKUP_DIR}
+for AGENT_SID in `ls /data | sed -n 's/<%= @project_name %>_\([0-9a-z]\{1,\}_[0-9]\{1,\}\)/\1/p' | sort -t_ -k1 -k2 -n`
+do
+if ps aux | /bin/grep ${AGENT_SID}|grep update_mnesia >/dev/null 2>&1
+then
+continue
+fi
+
+chmod +x /data/<%= @project_name %>_${AGENT_SID}/server/mgectl
+if [ ! -e ${BACKUP_DIR}/<%= @project_name %>_${AGENT_SID} ]
+then
+mkdir -p ${BACKUP_DIR}/<%= @project_name %>_${AGENT_SID}
+cd ${BACKUP_DIR}/<%= @project_name %>_${AGENT_SID}
+fi
+
+###20140722-kk###
+cd ${BACKUP_DIR}/<%= @project_name %>_${AGENT_SID}
+AGENT=`echo ${AGENT_SID} | awk -F '_' '{print $1}'`
+ID=`echo ${AGENT_SID} | awk -F '_' '{print $2}'`
+###20140722-kk###
+
+###判断该目录下已经有这个时间点的备份文件，将其移除
+if [ -e ${AGENT_SID}_${CHECK_Y}${CHECK_M}${CHECK_D}.$(CHECK_H).tar.gz ]
+then
+mv ${AGENT_SID}_${CHECK_Y}${CHECK_M}${CHECK_D}.$(CHECK_H).tar.gz ${AGENT_SID}_${CHECK_Y}${CHECK_M}${CHECK_D}.$(CHECK_H).tar.gz_`date +%s`
+fi
+
+###进行备份
+backup_size=0
+if [ -e /data/<%= @project_name %>_${AGENT_SID}/server/ ]
+then
+cd /data/<%= @project_name %>_${AGENT_SID}/server
+if ./mgectl backup manager
+then
+###开始备份的时间
+backup_time=`date "+%Y-%m-%d %H:%M:%S"`
+###备份的文件路径,日志文件路径
+cd ${BACKUP_DIR}/<%= @project_name %>_${AGENT_SID}
+backup_path=`echo ${PWD}`
+log_backup="${AGENT_SID}_${CHECK_Y}${CHECK_M}${CHECK_D}.$(CHECK_H).log"
+backup_filename="${AGENT_SID}_${CHECK_Y}${CHECK_M}${CHECK_D}.$(CHECK_H).tar.gz"
+while true
+do
+if ls ${backup_filename} >/dev/null 2>&1
+then
+if /usr/sbin/lsof ${backup_filename} >/dev/null 2>&1
+then
+sleep 30
+else
+STATUS=1
+result="ok"
+backup_size=$(du -sh ${backup_filename}|awk '{print $1}')
+break
+fi
+else
+sleep 1
+let time_limit+=1
+if [[ ! -e ${AGENT_SID}_${CHECK_Y}${CHECK_M}${CHECK_D}.$(CHECK_H).BUPTMP && $time_limit -gt 60 ]]
+then
+STATUS=0
+result="error"
+break
+fi
+fi
+done
+else
+echo "执行备份脚本mgectl失败，请检查"
+STATUS=0
+result="error"
+fi
+else
+echo "备份失败，不存在该区服"
+STATUS=0
+result="error"
+fi
+
+curl_fun(){
+curl -s -d "op=backup&args&game_dict={\"server_ip\": \"${SERVER_IP}\", \"project_name\": \"<%= @project_name %>\",\"agent\": \"${AGENT}\", \"server_role\": \"game\", \"server_id\":\"${ID}\", \"backup_time\": \"${backup_time}\", \"backup_filename\": \"${backup_filename}\",\"backup_status\":\"${STATUS}\",\"backup_type\":\"backup_mnesia\",\"backup_txt\":\"bakcup_mnesia ${result}\", \"backup_path\": \"${backup_path}\",\"backup_size\":\"${backup_size}\"}" "http://mc.yw_api.<%= @project_name %>.mingchaoonline.com:19048/<%= @project_name %>/mcyw/" > /data/tmp/curl_result.txt 2>&1
+if
+/bin/grep '1' /data/tmp/curl_result.txt
+then
+return 0
+else
+return 1
+fi
+}
+if curl_fun
+then
+echo "上传备份结果成功！！！"
+else
+if curl_fun
+then
+echo "上传备份结果成功！！！"
+else
+cat >> /data/logs/backup_error_`date +%Y%m%d%H`.log << EOF
+Error：curl -s -d "op=backup\&args\&game_dict={\"server_ip\": \"${SERVER_IP}\", \"project_name\": \"<%= @project_name %>\",\"agent\": \"${AGENT}\", \"server_role\": \"game\", \"server_id\":\"${ID}\", \"backup_time\": \"${backup_time}\", \"backup_filename\": \"${backup_filename}\",\"backup_status\":\"${STATUS}\",\"backup_type\":\"backup_mnesia\",\"backup_txt\":\"bakcup_mnesia ${result}\", \"backup_path\": \"${backup_path}\",\"backup_size\":\"${backup_size}\"}" "http://mc.yw_api.<%= @project_name %>.mingchaoonline.com:19048/<%= @project_name %>/mcyw/"
+EOF
+echo "上传备份结果失败！！！"
+fi
+fi
+
+#删除前一天的 3 9 12 15 18 21时间段的备份
+for i in 3 9 12 15 18 21
+do
+if [[ $(CHECK_H) == ${i} ]];then
+/bin/rm -f ${AGENT_SID}_${CHECK_Y}${CHECK_M}${Y_DAY}.$(CHECK_H).tar.gz
+fi
+done
+
+#删除31天前的备份
+if ls ${AGENT_SID}_${CHECK_Y}${Y_MONTH}${CHECK_D}* >/dev/null 2>&1
+then
+/bin/rm -f ${AGENT_SID}_${CHECK_Y}${Y_MONTH}${CHECK_D}*
+fi
+
+done
+

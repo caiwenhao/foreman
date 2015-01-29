@@ -1,0 +1,185 @@
+#!/bin/bash
+PROJ_NAME=<%= @project_name %>
+SERVER_IP=`/bin/awk -F= '/IPADDR/ {print $2}' /etc/sysconfig/network-scripts/ifcfg-eth0`
+SERVER_TYPE=`/bin/awk -F'[@_]' '/PS1/{print $NF}' /root/.bashrc|cut -d " " -f1`
+CURRDAY=`date "+%Y-%m-%d"`
+CURTIME=`date "+%Y-%m-%d %H:%M:%S"`
+WEEK_DAY=`date +%w`
+
+#定义保留多少个备份
+MAX_OLD_BACKUP=20
+
+#定义备份存放根目录
+BACKUP_BASE_DIR="/data/backup/all_backup"
+DAY_DIR=`date '+%Y%m%d-%H%M%S'`
+
+#定义是否备份，如果为1则备份，0则不备份，默认为1
+#周二更新，周三备份程序和一些配置
+if [ ${WEEK_DAY} = "3" -o ${WEEK_DAY} = "5" ]
+then
+BACKUP_DIR=1
+else
+BACKUP_DIR=0
+fi
+BACKUP_DB=0
+BACKUP_ERLANG_DB=1
+
+#服务器配置目录及游戏服配置目录
+DATA_DIR="
+/data/conf
+/data/sh
+/etc/sysconfig/iptables
+/var/spool/cron/root
+/etc/rc.d/rc.local
+/data/${PROJ_NAME}_91wan_1/server
+"
+
+#备份文件目录
+backup_file()
+{
+local prefix self AGENT SID BACKUP_DAY_DIR
+AGENT=$2
+SID=$3
+BACKUP_DAY_DIR=$4
+prefix=`dirname $1|sed "s#/${PROJ_NAME}[^\/]*#/${PROJ_NAME}_${AGENT}_${SID}#"`
+self=`basename $1`
+echo "do backup for ${prefix}/${self}"
+BACKUPFILENAME=${PROJ_NAME}_${AGENT}_S${SID}_${self}_${SERVER_TYPE}_${CURRDAY}.tar.bz2
+if [ ! -z "$1" ] ; then
+cd ${prefix}
+tar cjf ${BACKUP_DAY_DIR}/${BACKUPFILENAME} ${self} --exclude="*.log" --exclude="*.dump" --exclude="backup" --exclude="*.tar*" --exclude="static" --exclude="core.*"
+check_result $? ${BACKUPFILENAME} ${AGENT} ${SID} "tar"
+fi
+}
+
+#检查命令的退出状态函数
+check_result()
+{
+if [ $1 -eq 0 ]
+then
+#传参数给write_logs，第一个是日志类型，django认为1代表True，其他代表False，最后第三个参数是日志内容
+write_logs "progress" "1" $2 $3 $4 $5
+else
+write_logs "progress" "0" $2 $3 $4 $5
+
+fi
+}
+
+#写日志函数
+write_logs(){
+#日志类型,progress代表是备份过程的状态检测,check_md5代表检查文件md5值
+LOG_TYPE=$1
+#状态
+STATUS=$2
+FILENAME=$3
+local AGENT=$4
+local SID=$5
+shift
+shift
+shift
+shift
+shift
+LOG_CONTENT=$*
+LOG_FILE="${BACKUP_DAY_DIR}/${PROJ_NAME}_${AGENT}_S${SID}_${SERVER_TYPE}_backup_${CURRDAY}.log"
+echo "${CURTIME},${PROJ_NAME},${AGENT},${SID},${SERVER_IP},${SERVER_TYPE},${LOG_TYPE},${STATUS},${FILENAME},${LOG_CONTENT}" >> ${LOG_FILE}
+}
+
+CHECK_H(){
+echo "`date +%-H`"
+}
+#备份mnesia数据库
+backup_mnesia(){
+local BACKUP_DIR="/data/backup/database/"
+local CHECK_Y=`date +%Y`
+local CHECK_M=`date +%-m`
+local CHECK_D=`date +%-d`
+local MNSIAFILE=${AGENT_SID}_${CHECK_Y}${CHECK_M}${CHECK_D}.$(CHECK_H).tar.gz
+local AGENT_SID=$1
+local BACKUP_DAY_DIR=$2
+local AGENT=`echo ${AGENT_SID}|awk -F_ '{print $1}'`
+local SID=`echo ${AGENT_SID}|awk -F_ '{print $2}'`
+echo "do backup for mnesia ${AGENT_SID}"
+chmod +x /data/${PROJ_NAME}_${AGENT_SID}/server/mgectl
+cd ${BACKUP_DIR}/${PROJ_NAME}_${AGENT_SID}
+if [ -e ${MNSIAFILE} ]
+then
+mv ${MNSIAFILE} ${MNSIAFILE}_`date +%s`
+fi
+if [ -e /data/${PROJ_NAME}_${AGENT_SID}/server/ ]
+then
+cd /data/${PROJ_NAME}_${AGENT_SID}/server
+./mgectl backup manager
+cd ${BACKUP_DIR}/${PROJ_NAME}_${AGENT_SID}
+while true
+do
+if ls ${MNSIAFILE} >/dev/null 2>&1
+then
+if /usr/sbin/lsof ${MNSIAFILE} >/dev/null 2>&1
+then
+sleep 30
+else
+break
+fi
+else
+sleep 1
+let time_limit+=1
+if [[ ! -e ${AGENT_SID}_${CHECK_Y}${CHECK_M}${CHECK_D}.$(CHECK_H).BUPTMP && $time_limit -gt 60 ]]
+then
+break
+fi
+fi
+done
+else
+break
+fi
+MNESIAFN="${PROJ_NAME}_${AGENT}_S${SID}_mnesia_${SERVER_TYPE}_${CURRDAY}"
+/bin/cp ${BACKUP_DIR}/${PROJ_NAME}_${AGENT_SID}/${MNSIAFILE} ${BACKUP_DAY_DIR}/${MNESIAFN}.tar.gz
+check_result $? ${MNESIAFN}  ${AGENT} ${SID} 'backup mnesia'
+
+}
+
+
+for AGENT_SID in $(ls /data | sed -n 's/${PROJ_NAME}_\([0-9a-z]\{1,\}_[0-9]\{1,\}\)/\1/p' | sort -t_ -k1 -k2 -n)
+do
+AGENT=`echo ${AGENT_SID}|awk -F_ '{print $1}'`
+SID=`echo ${AGENT_SID}|awk -F_ '{print $2}'`
+BACKUP_DAY_DIR=${BACKUP_BASE_DIR}/${AGENT}_${SID}/${DAY_DIR}
+#创建备份文件存放目录
+if [ ! -d ${BACKUP_DAY_DIR} ]
+then
+mkdir -p ${BACKUP_DAY_DIR}
+chown -R mysql:mysql ${BACKUP_DAY_DIR}
+fi
+
+#备份服务器配置及脚本
+if [ "G${BACKUP_DIR}" == "G1" ]
+then
+for data in ${DATA_DIR}
+do
+backup_file ${data} ${AGENT} ${SID} ${BACKUP_DAY_DIR}
+done
+fi
+
+#备份游戏mnesia
+if [ "G${BACKUP_ERLANG_DB}" == "G1" ]
+then
+backup_mnesia ${AGENT_SID} ${BACKUP_DAY_DIR}
+fi
+
+#检查备份文件
+if cd ${BACKUP_DAY_DIR}/
+then
+for file in `ls *.tar* |grep -e 'tar.[g|b]z'`
+do
+md5_value=`/usr/bin/md5sum ${file} |awk '{print $1}'`
+file_size=`/bin/ls -l ${file} |awk '{print $5}'`
+write_logs "check_md5" "1" "${file}" ${AGENT} ${SID} "${file_size},${md5_value}"
+done
+fi
+done
+
+# clean old backup
+if [ -d ${BACKUP_BASE_DIR} ]
+then
+/usr/bin/find ${BACKUP_BASE_DIR} -name "20*" -type d -mtime +${MAX_OLD_BACKUP} |xargs -r /bin/rm -rf
+fi
