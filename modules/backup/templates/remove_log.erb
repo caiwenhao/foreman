@@ -1,0 +1,40 @@
+#!/bin/bash
+#2012-07-19
+#每周一凌晨删除日志文件，保留一星期日志
+
+#删除日期
+DelDate=`date +"%Y%m%d%H%M"`
+#临时目录
+TmpDir=/data/logs/log${DelDate}/
+#删除时保留一份压缩备份
+LogFile=/data/backup/old_log/log.${DelDate}.tar.bz2
+
+#检查备份目录是否存在
+cd /data/backup/
+if [ ! -e old_log ]
+then
+mkdir old_log
+fi
+
+#先收集需要删除的日志文件
+cd /data/logs/
+/usr/bin/find . -type f -name "*.log" -mtime +8 | cpio -pdv ${TmpDir}
+if [ -e ${TmpDir} ]
+then
+cd ${TmpDir}
+tar cjf ${LogFile} *
+#删除临时目录
+cd ..
+/bin/rm -fr ${TmpDir}
+fi
+#删除日志文件
+/usr/bin/find /data/logs/ -type f -name "*.log" -mtime +8  |xargs /bin/rm -f
+#删除旧的备份文件
+/usr/bin/find /data/backup/old_log/ -type f -name "*.tar.bz2" -mtime +32  |xargs /bin/rm -f
+#删除更新时的备份
+mkdir -p /data/backup/old_db
+/usr/bin/find /data/database/mnesia/ -type d -name "*.maintaince.*" -mtime +7|xargs -i /bin/mv {} /data/backup/old_db/
+/usr/bin/find /data/backup/old_db/ -type d -name "*.maintaince.*" -mtime +32|xargs /bin/rm -rf
+/usr/bin/find /data/backup/database/ -type f -name "*.tar.gz" -mtime +30|xargs /bin/rm -f
+/usr/bin/find /data/backup/merge_bak/ -name "*tgzt*" -mtime +14|xargs /bin/rm -rf
+/usr/bin/find /data/backup/database/ -type d -name "*tgzt*" -mtime +32 |xargs /bin/rm -rf
