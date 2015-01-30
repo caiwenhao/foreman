@@ -28,6 +28,7 @@ class centos_env::repo(){
     "libjpeg-turbo",
     "sudo",
     "crontabs",
+    "python-2.7.9-1.el6.x86_64",
   ]
   $network_tools = [
     "traceroute",

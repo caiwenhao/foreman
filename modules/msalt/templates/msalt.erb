@@ -1,0 +1,148 @@
+#主配置
+[main]
+#定义角色
+<% if @project_name.include? "admin" -%>
+node_role = admin,server
+<% elsif @project_name.include? "router" -%>
+node_role = router,server
+<% else -%>
+node_role = game,gmain,server
+<% end -%>
+node_ip = <%= @ipaddress %>
+#缓存路径
+cache = var/cache
+#模块路径
+module = module/
+#文件备份路径
+backup = var/backup
+#copy文件的备份路径
+copy_backup = /data/backup/msalt_copy/
+#plugins路径
+fs_plugin = plugins/fservice
+
+#pid文件
+pidfile = /var/run/msalt.pid
+
+#日志定义
+log_file = /data/logs/msalt.log
+log_level = INFO
+#认证key，数据传输用
+token = halq0n1eH6NqoWj5gjA79/j+xebQ2LSQSsVC88YN0ix68tIC0rZAzd7OoeQmqLz2XFXkcL2cDZk=
+#线程数量
+thread_num = 20
+#不能使用正则来匹配节点的cmd，用逗号分隔
+no_regex_cmds = common_tools.change_online_datetime,admin_tools.truncate_admin,common_tools.truncate_game,install_game.do
+#zookeeper任务保存时间
+keep_job_time=2592000
+
+#http_start
+#http pid文件
+http_pidfile = /var/run/msalt_http.pid
+#http监听端口
+http_port = 61131
+# http验证key
+http_auth_token = Q2W2H8oxDHTDWpPV
+# 是否需要验证timestamp超时时间, 1或0
+verify_expire = 1
+# http请求timestamp超时时间，单位秒
+http_expire_time = 300
+# http日志文件
+http_log_file = /data/logs/msalt_http.log
+# http日志允许查看的目录列表，以逗号分隔
+http_log_dir_list = /data/logs/,/var/log/
+# http允许查看的日志文件后缀列表，以逗号分隔
+http_log_file_suffix = .log,.message
+# http允许查看的特殊文件名正则列表，以逗号分隔
+http_exp_log_file_regx = ^cron-.*$,^message
+# http 允许的ip列表，以逗分隔
+http_permission_ip = 121.10.118.167
+#http_end
+
+[zookeeper]
+#zookeepr连接，支持多个，通过逗号分隔
+zk_servers = 121.10.118.167:60001,183.61.136.174:60001,121.10.118.172:60001
+
+#zookeeper认证
+zk_scheme = digest
+zk_auth = tgzt:msalt3d6ktsHYOkqoizS2E8dh
+
+#相关目录path
+root=/msalt
+nodes=%(root)s/nodes
+
+[fservice]
+fs_type = rsync
+fs_host = 121.10.118.167
+fs_port = 61768
+fs_user = msalt
+fs_pass = 2QhDfU2PVa6boKGMGIVv
+fs_failtry = 3
+
+#其他方面的配置
+[others]
+api_token = 84dstWVxeoiOV3ymivAi
+log_url = http://log.yw.mc.mingchaoonline.com
+queue_url = http://queue.yw.mc.mingchaoonline.com
+
+#如果一台机中有多个同角色但不同代理的节点，用逗号分隔
+###server角色配置
+[server_role]
+project = tgzt
+agent = lianyun
+node_name = %(project)s_%(agent)s_server
+
+#gmain角色配置
+[gmain_role]
+project = <%= @project_name %>
+agent = lianyun
+node_name = %(project)s_%(agent)s_gmain
+
+#game角色配置
+[game_role]
+node_name = @@gen.game
+
+#admin角色配置
+[admin_role]
+node_name = @@gen.admin tgzt
+
+#master角色配置
+[master_role]
+project = <%= @project_name %>
+agent = lianyun
+node_name = %(project)s_%(agent)s_master
+
+#tole角色配置
+[tlog_role]
+project = <%= @project_name %>
+agent = lianyun
+node_name = %(project)s_%(agent)s_tlog
+
+#center角色配置
+[center_role]
+project = <%= @project_name %>
+agent = lianyun
+node_name = %(project)s_%(agent)s_center
+
+#central角色配置
+[central_role]
+project = <%= @project_name %>
+agent = lianyun
+node_name = %(project)s_%(agent)s_central
+
+#router角色配置
+[router_role]
+project = <%= @project_name %>
+agent = lianyun
+node_name = %(project)s_%(agent)s_router
+
+
+[mysql]
+host = localhost
+user = mcyw_up
+passwd = hLU3MvDsGey7r06EwcWH
+db = mcyw_up
+port = 3306
+
+
+#mgectl不允许执行的危险命令正则列表，以英文,分隔
+mgectl_exclude_command = ^os
