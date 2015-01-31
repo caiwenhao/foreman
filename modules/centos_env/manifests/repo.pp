@@ -29,6 +29,10 @@ class centos_env::repo(){
     "sudo",
     "crontabs",
     "python-2.7.9-1.el6.x86_64",
+    "glibc-2.12-1.149.el6_6.5",
+    "glibc-common-2.12-1.149.el6_6.5",
+    "glibc-devel-2.12-1.149.el6_6.5",
+    "glibc-headers-2.12-1.149.el6_6.5",
   ]
   $network_tools = [
     "traceroute",
