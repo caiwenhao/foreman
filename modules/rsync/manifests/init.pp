@@ -1,5 +1,5 @@
 class rsync(
-  $rsync_package = "rsync-3.0.6-12.el6.x86_64",
+  $rsync_package = "rsync-3.1.1-12.el6.x86_64",
 ){
   package { "$rsync_package":
     ensure         => installed,
