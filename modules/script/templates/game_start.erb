@@ -1,0 +1,98 @@
+#!/bin/bash
+serverlist="/tmp/start_game_`tr -dc A-Za-z0-9 </dev/urandom |head -c8`.txt"
+find /data -maxdepth 1 -type d | /bin/grep "<%= @project_name %>_" | awk -F\/ '{print $NF}' | sort > ${serverlist}
+startLog="/data/logs/start_server_power_on.log"
+startTime(){
+echo "`date +'%Y-%m-%d %H:%M:%S'`"
+}
+export HOME=/root
+> $startLog
+
+###############
+#通用多进程操作
+#调用方法：
+#run_process <p_num> <list_file> <your_function> [your_function_parameter]
+  ################
+  function run_process(){
+
+  #模拟进程数量
+  p_num=${1}
+
+  #队列文件
+  p_list_file=${2}
+
+  #将位置参数左移一位
+  shift 2
+
+  #获取执行的函数调用
+  p_run=${*}
+
+  #监听获取1 2 3 15 信号，一旦捕获到任何一个，执行kill -9 0，马上kill子进程
+  trap 'kill -9 0' 1 2 3 15
+
+  #创建管道文件,这里创建完然后又删除掉是为了不要生成垃圾文件。创建好了以后虽然删除掉，但是，只要这个进程没有退出，那么这个文件在内存中还不会释放，继续供进程使用
+  _fifo_tmp_=$$.fifo
+  mkfifo $_fifo_tmp_
+  exec 4<>$_fifo_tmp_
+  rm -f $_fifo_tmp_
+
+  #失败操作记录
+  fail_log=$$.log
+
+  #这个主要用来做多进程的占位符，将n个空格写到管道文件中
+  for((i=0;i<$p_num;i++))
+  do
+  echo
+  done >&4
+
+  #从任务列表中每次读入n行并在后台开启n个进程，直到列表读入完毕
+  while read go
+  do
+  #一个read -u4命令执行一次，就从fd4中减去一个回车符，然后向下执行,当fd4中没有回车符的时候，就停在这了，从而实现了线程数量控制
+  read -u4
+  (
+  ${p_run} ${go} || echo ${go} >> ${fail_log}
+  #这里要补一个空格，随时保持一定数量的空格在文件描述符4指向的管道文件中
+  echo >&4
+  ) &
+  done < ${p_list_file}
+
+
+  #等待子进程退出
+  wait
+
+  #关闭文件描述符
+  exec 4<&-
+
+  #并发进程结束后判断是否全部成功
+  if [ -s ${fail_log} ]
+  then
+  color r "有没有成功执行的队列："
+  cat ${fail_log}
+  rm -f ${fail_log}
+  fi
+  }
+
+  main(){
+  agentserver=${1}
+  agentName=$(echo $agentserver | awk -F_ '{print $2}')
+  serverID=$(echo $agentserver | awk -F_ '{print $3}')
+  game_num="$(ps aux|/bin/grep -Ew "game_${agentName}_${serverID}@127.0.0.1|cross_${agentName}_${serverID}@*|${agentName}_manager@*"|/bin/grep beam|/bin/grep mnesia|/bin/grep -Ev "grep|debug|backup|start_server_power_on" |wc -l)"
+
+  if [[ "${game_num}" != "0" ]]
+  then
+  echo -e "${agentName}_${serverID} 游戏已启动，请勿重复运行。"
+  exit 1
+  fi
+  echo "start_info $agentName $serverID === `startTime` ===准备开启游戏" >> $startLog 2>&1
+  cd /data/database/mnesia/$agentserver/
+  if [ -e tab_size.dat ]
+  then
+  mv tab_size.dat /data/$agentserver/backup/tab_size.dat.`date +'%Y-%m-%d_%H%M%S'`
+  fi
+  /bin/bash /data/$agentserver/server/mgectl start >> $startLog 2>&1
+  }
+
+  run_process 8 ${serverlist} main
+
+  
