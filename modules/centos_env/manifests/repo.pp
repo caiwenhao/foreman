@@ -60,6 +60,14 @@ class centos_env::repo(){
     "sysstat",
     "dstat",
   ]
+  $remove_package = [
+    "Python-2.7.3-1.x86_64",
+  ]
+  package { $remove_package:
+    ensure => absent,
+    before => Package[$common_package],
+    allow_virtual  => false,
+  }
   package { $common_package:
     ensure         => installed,
     require        => Yumrepo["mcyw"],
