@@ -25,7 +25,7 @@ class centos_env(
 #为历史命令加上时间
   exec {"add_time_history":
     path    => ["/usr/bin", "/usr/sbin","/bin"],
-    creates => "/var/tmp/add_time_history",
+    unless => "grep HISTTIMEFORMAT /etc/profile 2>/dev/null",
     command => "sed -i '/HISTTIMEFORMAT/d' /etc/profile;echo 'HISTTIMEFORMAT=\"%Y/%m/%d %H:%M:%S \"' >> /etc/profile",
   }
 
