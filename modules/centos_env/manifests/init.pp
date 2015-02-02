@@ -22,6 +22,13 @@ class centos_env(
     ensure  => file,
     content => template("centos_env/bash_profile.erb"),
   }
+#为历史命令加上时间
+  exec {"add_time_history":
+    path    => ["/usr/bin", "/usr/sbin","/bin"],
+    creates => "/var/tmp/add_time_history",
+    command => "sed -i '/HISTTIMEFORMAT/d' /etc/profile;echo 'HISTTIMEFORMAT=\"%Y/%m/%d %H:%M:%S \"' >> /etc/profile",
+  }
+
  #创建www用户
   user {"www":
     ensure => "present",
