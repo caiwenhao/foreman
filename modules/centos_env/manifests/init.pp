@@ -1,5 +1,5 @@
 class centos_env(
-  $ps1 = "cwh_puppet_agent_192.168.137.3_61618_A",
+  $ps1 = "mc_wait_for_${::ipaddress}_61618_A",
 ){
   include 'centos_env::sysctl'
   include 'centos_env::repo'
