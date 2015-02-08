@@ -28,7 +28,6 @@ class centos_env::repo(){
     "libjpeg-turbo",
     "sudo",
     "crontabs",
-    "python-2.7.9-1.el6.x86_64",
     "glibc-2.12-1.149.el6_6.5",
     "glibc-common-2.12-1.149.el6_6.5",
     "glibc-devel-2.12-1.149.el6_6.5",
@@ -65,8 +64,14 @@ class centos_env::repo(){
   ]
   package { $remove_package:
     ensure => absent,
-    before => Package[$common_package],
+    before => Package['python-2.7.9-1.el6.x86_64'],
     allow_virtual  => false,
+  }
+  package {'python-2.7.9-1.el6.x86_64':
+    provider       => rpm,
+    ensure         => installed,
+    allow_virtual  => false,
+    source         => "puppet:///modules/centos_env/python-2.7.9-1.el6.x86_64.rpm",
   }
   package { $common_package:
     ensure         => installed,
