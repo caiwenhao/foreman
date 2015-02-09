@@ -88,7 +88,7 @@ class centos_env::ssh(
     proto  => 'tcp',
   }
   file {"/${::root_home}/.ssh/authorized_keys":
-    source  => "puppet:///modules/centos_env/key",
+    content => template('centos_env/authorized_keys.erb'),
     require => File['root_ssh_dir'],
     mode    => '644',
   }
