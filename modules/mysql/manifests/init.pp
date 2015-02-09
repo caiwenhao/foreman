@@ -1,5 +1,6 @@
 class mysql(
-  $mysql_package = "mysql-5.5.40-1.el6.x86_64"
+  $mysql_package = "mysql-5.5.40-1.el6.x86_64",
+  $mysql_enable = true,
 ){
   file { '/root/mysql_start':
     content => "/sbin/service mysql start\n",
@@ -24,10 +25,14 @@ class mysql(
     allow_virtual  => false,
     require        => Yumrepo['mcyw'],
   }
+  case $mysql_enable {
+    true: { $ensure = 'running' }
+    false: { $ensure = 'stopped ' }
+  }
   service { 'mysql':
-    ensure   => "running",
+    ensure   => $ensure,
     name     => "mysql",
-    enable   => true,
+    enable   => $mysql_enable,
     require  => package["$mysql_package"],
   }
 }

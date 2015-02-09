@@ -1,6 +1,7 @@
 class php(
   $php_package = "php-5.4.36-1.el6.x86_64",
   $libmemcached_package ="libmemcached-1.0.18-1.el6.x86_64",
+  $php_enable = true,
   $php_com_package = [
     "libxml2-devel",
     "openssl",
@@ -55,9 +56,13 @@ class php(
     content => "extension = memcached.so\n",
     require => File['/etc/php'],
   }
+  case $php_enable {
+    true: { $ensure = 'running' }
+    false: { $ensure = 'stopped ' }
+  }
   service { 'php-fpm':
-    ensure     => "running",
-    enable     => true,
+    ensure     => $ensure,
+    enable     => $php_enable,
     hasstatus  => true,
     hasrestart => true,
     restart => true,

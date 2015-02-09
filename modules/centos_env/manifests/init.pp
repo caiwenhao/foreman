@@ -1,5 +1,5 @@
 class centos_env(
-  $ps1 = "mc_wait_for_${::ipaddress}_61618_A",
+  $ps1 = "mc_wait_for_${::ipaddress}_61618_A"
 ){
   include 'centos_env::sysctl'
   include 'centos_env::repo'
@@ -28,7 +28,6 @@ class centos_env(
     unless => "grep HISTTIMEFORMAT /etc/profile 2>/dev/null",
     command => "sed -i '/HISTTIMEFORMAT/d' /etc/profile;echo 'HISTTIMEFORMAT=\"%Y/%m/%d %H:%M:%S \"' >> /etc/profile",
   }
-
  #创建www用户
   user {"www":
     ensure => "present",
@@ -38,7 +37,6 @@ class centos_env(
   group {"www":
     ensure => "present",
   }
-  
 #创建必要的目录
   centos_env::lib::mkdir_p { "/data/database": }
   file {'database':

@@ -1,5 +1,6 @@
 class nginx(
-  $nginx_package = "nginx-1.6.2-1.el6.ngx.x86_64"
+  $nginx_package = "nginx-1.6.2-1.el6.ngx.x86_64",
+  $nginx_enable = true,
 ){
   if $operatingsystem in ["CentOS"] {
     $service_start = '/sbin/service nginx start'
@@ -73,14 +74,17 @@ class nginx(
     dport  => "80",
     proto  => 'tcp',
   }
+  case $nginx_enable {
+    true: { $ensure = 'running' }
+    false: { $ensure = 'stopped ' }
+  }
   service { 'nginx':
-    ensure     => "running",
-    enable     => true,
+    ensure     => $ensure,
+    enable     => $nginx_enable,
     hasstatus  => true,
     hasrestart => true,
     restart => true,
     require => User['www'],
-
   }
 
 }

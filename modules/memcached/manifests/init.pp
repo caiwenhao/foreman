@@ -1,5 +1,6 @@
 class memcached(
   $memcached_package = "memcached-1.4.21-3.el6.art.x86_64",
+  $memcached_enable = true,
 ){
   package { "$memcached_package":
     ensure         => installed,
@@ -26,17 +27,21 @@ class memcached(
     content => "/etc/init.d/memcached stop\n/etc/init.d/memcached_session stop\n",
     mode    => '700',
   }
+  case $memcached_enable {
+    true: { $ensure = 'running' }
+    false: { $ensure = 'stopped ' }
+  }
   service { 'memcached':
-    ensure     => "running",
-    enable     => true,
+    ensure     => $ensure,
+    enable     => $memcached_enable,
     hasstatus  => true,
     hasrestart => true,
     restart    => true,
     require    => File["memcached"],
   }
   service { 'memcached_session':
-    ensure     => "running",
-    enable     => true,
+    ensure     => $ensure,
+    enable     => $memcached_enable,
     hasstatus  => true,
     hasrestart => true,
     restart    => true,
