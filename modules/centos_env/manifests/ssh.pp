@@ -1,12 +1,12 @@
 class centos_env::ssh(
   $ssh_port = "61618",
-  $sshd_packages = "bash-4.3.30-4.el6.x86_64",
+  $sshd_packages = "bash-4.3.30-1.el6.x86_64",
   $root_passwd = inline_template("<%= @ipaddress + 'mingchao' %>")
 )
 {
   case $::osfamily {
     'RedHat': {
-      $packages                        = ['openssh-server', 'openssh-clients',"$sshd_packages",]
+      $packages                        = ['openssh-server', 'openssh-clients']
       $service_name                    = 'sshd'
       $ssh_config_hash_known_hosts     = 'no'
       $ssh_config_forward_x11_trusted  = 'yes'
@@ -50,9 +50,21 @@ class centos_env::ssh(
       fail("ssh supports osfamilies RedHat, Suse, Debian and Solaris. Detected osfamily is <${::osfamily}>.")
     }
   }
-  package { $packages:
-    ensure    => installed,
-    allow_virtual => false,
+  package { ['openssh-server', 'openssh-clients']:
+    ensure         => installed,
+    allow_virtual  => false,
+    require        => Yumrepo['mcyw'],
+    before         => Exec['install_bash'],
+  }
+  file {"${sshd_packages}.rpm":
+    source  => "puppet:///modules/centos_env/${sshd_packages}.rpm",
+    path    => '/dist/dist/${sshd_packages}.rpm',
+  }
+  exec {'install_bash':
+    command => "/bin/rpm -U /dist/dist/${sshd_packages}.rpm --force",
+    path    => ["/usr/bin", "/usr/sbin"],
+    unless => "/bin/rpm -qa |/bin/grep ${sshd_packages} 2>/dev/null",
+    require => File["${sshd_packages}.rpm"],
   }
   augeas  { 'ssh_config' :
     context => "/files",
@@ -80,7 +92,7 @@ class centos_env::ssh(
     enable     => true,
     hasrestart => true,
     hasstatus  => true,
-    require => Package[$packages],
+    require    => Package[$packages],
   }
   firewall { "$ssh_port for SSH":
     action => 'accept',
