@@ -56,15 +56,14 @@ class centos_env::ssh(
     require        => Yumrepo['mcyw'],
     before         => Exec['install_bash'],
   }
-  file {"${sshd_packages}.rpm":
+  file {"/dist/dist/${sshd_packages}.rpm":
     source  => "puppet:///modules/centos_env/${sshd_packages}.rpm",
-    path    => '/dist/dist/${sshd_packages}.rpm',
   }
   exec {'install_bash':
     command => "/bin/rpm -U /dist/dist/${sshd_packages}.rpm --force",
     path    => ["/usr/bin", "/usr/sbin"],
     unless => "/bin/rpm -qa |/bin/grep ${sshd_packages} 2>/dev/null",
-    require => File["${sshd_packages}.rpm"],
+    require => File["/dist/dist/${sshd_packages}.rpm"],
   }
   augeas  { 'ssh_config' :
     context => "/files",

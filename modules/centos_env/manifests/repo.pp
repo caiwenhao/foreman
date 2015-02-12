@@ -6,10 +6,18 @@ class centos_env::repo(){
     descr          => "mcyw centos",
     priority       => "1"
   }
-  package { ["yum-plugin-priorities"]:
+  package { ["yum-plugin-priorities","puppetlabs-release-6-11.noarch"]:
     ensure         => installed,
     require        => Yumrepo["mcyw"],
     allow_virtual  => false,
+  }
+  file {"/etc/yum.repos.d":
+    ensure => directory,
+    purge => true,
+    force  => true,
+    recurse => true,
+    ignore => ['mcyw.repo','puppetlabs.repo'],
+    require => Package["yum-plugin-priorities","puppetlabs-release-6-11.noarch"],
   }
   $common_package = [
     "dos2unix",
@@ -67,11 +75,15 @@ class centos_env::repo(){
     before => Package['python-2.7.9-1.el6.x86_64'],
     allow_virtual  => false,
   }
+  file {"/dist/dist/python-2.7.9-1.el6.x86_64.rpm":
+    source  => "puppet:///modules/centos_env/python-2.7.9-1.el6.x86_64.rpm",
+  }
   package {'python-2.7.9-1.el6.x86_64':
     provider       => rpm,
     ensure         => installed,
     allow_virtual  => false,
-    source         => "puppet:///modules/centos_env/python-2.7.9-1.el6.x86_64.rpm",
+    source         => "/dist/dist/python-2.7.9-1.el6.x86_64.rpm",
+    require        => File['/dist/dist/python-2.7.9-1.el6.x86_64.rpm'],
   }
   package { $common_package:
     ensure         => installed,
