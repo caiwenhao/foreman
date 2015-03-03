@@ -45,4 +45,18 @@ class backup(
     minute  => 0,
     require => Package["crontabs"];
   }
+  tidy { '/data/logs':
+    age     => '5w',
+    recurse =>  true,
+    type    => 'ctime',
+    path    => '/data/logs',
+    backup  => false,
+  }
+  tidy { '/data/backup':
+    age     => '10w',
+    recurse =>  true,
+    type    => 'ctime',
+    path    => '/data/backup',
+    backup  => false,
+  }
 }
