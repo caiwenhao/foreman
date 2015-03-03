@@ -10,7 +10,7 @@ ListenPort=<%= listen_port %>
 StartAgents=5
 ##### Active checks related
 ServerActive=<%= proxy_list %>:<%= server_port %>
-Hostname=<%= zabbix_hostname %>
+Hostname=<%= @ps1 %>
 RefreshActiveChecks=120
 BufferSend=30
 BufferSize=100

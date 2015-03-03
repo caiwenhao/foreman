@@ -2,7 +2,6 @@ class zabbix(
   $proxy_list = get_url("http://183.61.135.114:30062?ip=${wan_ip}&qq_projet="),
   $zbbix_package ="zabbix_agent-2.2.8-1.el6",
   $zabbix_center ="183.61.135.114,103.5.57.114",
-  $zabbix_hostname = $centos_env::ps1,
   $listen_port = 30060,
   $server_port = 30061
 ){

@@ -1,0 +1,25 @@
+[main]
+logdir = /var/log/puppet
+rundir = /var/run/puppet
+ssldir = $vardir/ssl
+
+[agent]
+classfile = $vardir/classes.txt
+olocalconfig = $vardir/localconfig
+server = <%= @puppet_server %>
+<% if @virtual == 'vmware' -%>
+certname = <%= @serialnumber.gsub(/ /,'') %>.mcyw.mingchaoonline.com
+<% else -%>
+certname = <%= @serialnumber %>.mcyw.mingchaoonline.com
+<% end -%>
+report            = true
+pluginsync        = true
+masterport        = 8140
+environment       = production
+listen            = false
+splay             = false
+splaylimit        = 1800
+runinterval       = 1800
+noop              = false
+configtimeout     = 120
+usecacheonfailure = true

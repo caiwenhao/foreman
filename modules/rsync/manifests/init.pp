@@ -53,4 +53,17 @@ class rsync(
     server_args => "--daemon --config /etc/rsyncd.conf",
     require     => Package["$rsync_package"],
   }
+  file {'/var/log/rsyncd.log':
+    ensure  => file,
+    mode    => 0664,
+    owner   => root,
+  }
+  logrotate::rule { 'rsyncd':
+    path         => '/var/log/rsyncd.log',
+    rotate       => 14,
+    rotate_every => 'daily',
+    ifempty      => false,
+    copytruncate => true,
+    create       => true,
+  }
 }
