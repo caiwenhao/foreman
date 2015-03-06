@@ -9,9 +9,9 @@ class puppet(
   }
   file { "puppet.conf":
     content => template('puppet/puppet.erb'),
-    path => "/etc/puppet/puppet.conf",
+    path    => "/etc/puppet/puppet.conf",
     require => Package["$puppet_package"],
-    notify => Service['zabbix_agentd']
+    notify  => Service['zabbix_agentd']
   }
   service { 'puppet':
     ensure     => "running",
