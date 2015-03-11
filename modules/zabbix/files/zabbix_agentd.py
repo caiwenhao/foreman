@@ -339,6 +339,8 @@ def get_service():
         service_list.append('mlog')
     if re.findall(r'bgp',process):
         service_list.append('bgp')
+    if os.path.exists('/data/msalt'):
+        service_list.append('msalt')
     print ','.join(service_list)
 
 #输出值

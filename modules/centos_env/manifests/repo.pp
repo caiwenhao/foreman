@@ -40,6 +40,7 @@ class centos_env::repo(){
     "glibc-common-2.12-1.149.el6_6.5",
     "glibc-devel-2.12-1.149.el6_6.5",
     "glibc-headers-2.12-1.149.el6_6.5",
+    "parted-2.1-25.el6.x86_64",
   ]
   $network_tools = [
     "traceroute",
