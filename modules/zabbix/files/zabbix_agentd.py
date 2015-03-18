@@ -372,5 +372,20 @@ def check_iptables():
 def mysql_slave():
    print get_cmd_data('/usr/local/bin/mysql -uroot -p$(cat /data/save/mysql_root) -e "show slave status \G"|/bin/grep %s'% sys.argv[3])
 
-all_zabbix = {'mysql_slave':mysql_slave,'check_iptables':check_iptables,'del_key':del_key,'get_service':get_service,'get_group':get_group,'ip_discovery':ip_discovery,'tcp_ss':tcp_ss,'mysql_status':mysql_status,'nginx_status':nginx_status,"game_discovery":game_discovery,"game_status":game_status,"game_num":game_num,"mgectl_exprs":mgectl_exprs,"crond_num":crond_num,"check_connect_cross":check_connect_cross,"game_online_sum":game_online_sum,"check_log_size":check_log_size,'disk_performance':disk_performance,'disk_discovery':disk_discovery,'echo':echo}
+def check_timezone():
+   time_zone = ""
+   result = 0
+   fp=open('/root/.bashrc',"r")
+   alllines=fp.read()
+   fp.close()
+   p = re.compile(r'TimeZone=(?P<time_zone>.*)')
+   m = p.search(alllines)
+   if m:
+       time_zone = m.groupdict()['time_zone']
+       local_time = get_cmd_data('/bin/date +%Z')
+       if time_zone != local_time :
+           result = 1   
+   print result
+
+all_zabbix = {'check_timezone':check_timezone,'mysql_slave':mysql_slave,'check_iptables':check_iptables,'del_key':del_key,'get_service':get_service,'get_group':get_group,'ip_discovery':ip_discovery,'tcp_ss':tcp_ss,'mysql_status':mysql_status,'nginx_status':nginx_status,"game_discovery":game_discovery,"game_status":game_status,"game_num":game_num,"mgectl_exprs":mgectl_exprs,"crond_num":crond_num,"check_connect_cross":check_connect_cross,"game_online_sum":game_online_sum,"check_log_size":check_log_size,'disk_performance':disk_performance,'disk_discovery':disk_discovery,'echo':echo}
 all_zabbix[options.zabbix]()

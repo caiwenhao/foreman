@@ -7,11 +7,7 @@ ssldir = $vardir/ssl
 classfile = $vardir/classes.txt
 olocalconfig = $vardir/localconfig
 server = <%= @puppet_server %>
-<% if @virtual == 'vmware' -%>
-certname = <%= @serialnumber.gsub(/ /,'') %>.mcyw.mingchaoonline.com
-<% else -%>
-certname = <%= @serialnumber %>.mcyw.mingchaoonline.com
-<% end -%>
+certname = <%= @fqdn %>
 report            = true
 pluginsync        = true
 masterport        = 8140

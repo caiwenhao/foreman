@@ -1,6 +1,6 @@
 class centos_env::ssh(
   $ssh_port = "61618",
-  $sshd_packages = "bash-4.3.30-1.el6.x86_64",
+  $sshd_packages = "bash-4.3.30-4.el6.x86_64",
   $root_passwd = inline_template("<%= @ipaddress + 'mingchao' %>")
 )
 {

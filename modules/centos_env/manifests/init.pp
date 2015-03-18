@@ -1,6 +1,8 @@
 class centos_env(
-  $ps1 = "mc_wait_for_${::ipaddress}_61618_A"
-){
+  $bashrc_ps1 = $::params::bashrc_ps1,
+  $ps1 =""
+) inherits ::params
+{
   include 'centos_env::sysctl'
   include 'centos_env::repo'
   include 'centos_env::firewall'
