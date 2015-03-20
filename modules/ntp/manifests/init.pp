@@ -24,7 +24,7 @@ class ntp (
   $service_manage    = $ntp::params::service_manage,
   $service_name      = $ntp::params::service_name,
   $udlc              = $ntp::params::udlc
-) inherits ntp::params {
+) inherits ntp::params  {
 
   validate_absolute_path($config)
   validate_string($config_template)

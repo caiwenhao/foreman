@@ -1,7 +1,8 @@
 class nginx(
   $nginx_package = "nginx-1.6.2-1.el6.ngx.x86_64",
   $nginx_enable = true,
-){
+) inherits ::params
+{
   if $operatingsystem in ["CentOS"] {
     $service_start = '/sbin/service nginx start'
     $service_reload = '/sbin/service nginx reload'

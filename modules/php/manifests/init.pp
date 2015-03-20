@@ -1,7 +1,7 @@
 class php(
-  $php_package = "php-5.4.36-1.el6.x86_64",
-  $libmemcached_package ="libmemcached-1.0.18-1.el6.x86_64",
-  $php_enable = true,
+  $php_package = $::params::php_package,
+  $libmemcached_package = $::params::libmemcached_package,
+  $php_enable = $::params::php_enable,
   $php_com_package = [
     "libxml2-devel",
     "openssl",
@@ -17,7 +17,8 @@ class php(
     "libmcrypt-devel",
     "libjpeg-turbo",
   ]
-){
+) inherits ::params
+{
   package { "$libmemcached_package":
     ensure         => installed,
     allow_virtual  => false,

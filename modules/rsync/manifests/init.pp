@@ -1,6 +1,7 @@
 class rsync(
-  $rsync_package = "rsync-3.1.1-12.el6.x86_64",
-){
+  $rsync_package = $::params::rsync_package,
+) inherits ::params
+{
   package { "$rsync_package":
     ensure         => installed,
     allow_virtual  => false,

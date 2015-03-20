@@ -1,7 +1,8 @@
 class puppet(
-  $puppet_package ="puppet-3.7.4-1.el6.noarch",
-  $puppet_server ="foreman.mcyw.mingchaoonline.com",
-){
+  $puppet_package = $::params::puppet_package,
+  $puppet_server = $::params::puppet_server,
+) inherits ::params
+{
   package { "$puppet_package":
     ensure         => installed,
     allow_virtual  => false,

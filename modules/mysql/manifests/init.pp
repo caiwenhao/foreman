@@ -1,7 +1,8 @@
 class mysql(
-  $mysql_package = "mysql-5.5.40-1.el6.x86_64",
-  $mysql_enable = true,
-){
+  $mysql_package = $::params::mysql_package,
+  $mysql_enable = $::params::mysql_enable,
+) inherits ::params
+{
   file { '/root/mysql_start':
     content => "/sbin/service mysql start\n",
     mode    => '700',

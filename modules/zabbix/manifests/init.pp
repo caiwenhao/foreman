@@ -1,10 +1,12 @@
 class zabbix(
-  $proxy_list = get_url("http://183.61.135.114:30062?ip=${wan_ip}&qq_projet="),
-  $zbbix_package ="zabbix_agent-2.2.8-1.el6",
-  $zabbix_center ="183.61.135.114,103.5.57.114",
-  $listen_port = 30060,
-  $server_port = 30061
-){
+  $proxy_list = $::params::proxy_list,
+  $zbbix_package = $::params::zbbix_package,
+  $zabbix_center = $::params::zabbix_center,
+  $listen_port = $::params::listen_port,
+  $server_port = $::params::server_port,
+  $bashrc_ps1 = $::params::bashrc_ps1,
+)inherits ::params
+{
   package { "$zbbix_package":
     ensure         => installed,
     allow_virtual  => false,

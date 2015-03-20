@@ -1,6 +1,7 @@
 class erlang(
-  $erlang_package = "erlang-17.3-1.el6.x86_64",
-){
+  $erlang_package = $::params::erlang_package,
+)inherits ::params
+{
   package { "$erlang_package":
     ensure         => installed,
     allow_virtual  => false,

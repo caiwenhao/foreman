@@ -1,5 +1,7 @@
 class backup(
-){
+  $project_name = $::params::project_name,
+) inherits ::params
+{
   centos_env::lib::mkdir_p { "/data/sh/backup": }
   file {"/data/sh/backup":
     ensure  => directory,

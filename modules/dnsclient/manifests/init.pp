@@ -4,18 +4,19 @@
 # common class that applies to all systems.
 #
 class dnsclient                 (
-  $nameservers                 = ['121.10.118.123','114.114.114.114','223.5.5.5','223.6.6.6','112.124.47.27','202.96.128.143','202.96.128.166','202.96.128.86'],
-  $options                     = [ 'rotate',
+  $nameservers                   =  $::params::nameservers,
+  $options                        = [ 'rotate',
                                   'timeout:1'],
-  $search                      = ['UNSET'],
-  $domain                      = 'UNSET',
-  $sortlist                    = ['UNSET'],
-  $resolver_config_file        = '/etc/resolv.conf',
+  $search                         = ['UNSET'],
+  $domain                         = 'UNSET',
+  $sortlist                       = ['UNSET'],
+  $resolver_config_file         = '/etc/resolv.conf',
   $resolver_config_file_ensure = 'file',
   $resolver_config_file_owner  = 'root',
   $resolver_config_file_group  = 'root',
   $resolver_config_file_mode   = '0644',
-) {
+)  inherits ::params
+{
 
   # Validates domain
   if is_domain_name($domain) != true {

@@ -1,7 +1,8 @@
 class memcached(
-  $memcached_package = "memcached-1.4.21-3.el6.art.x86_64",
-  $memcached_enable = true,
-){
+  $memcached_package = $::params::memcached_package,
+  $memcached_enable = $::params::memcached_enable,
+) inherits ::params
+{
   package { "$memcached_package":
     ensure         => installed,
     allow_virtual  => false,

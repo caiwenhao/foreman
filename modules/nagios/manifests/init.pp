@@ -1,8 +1,9 @@
 class nagios(
-  $nagios_package ="nagios-1.0.0-1.el6.x86_64",
-  $nagios_server = "219.129.216.215",
-  $nagios_port = 5666
-){
+  $nagios_package = $::params::nagios_package,
+  $nagios_server =$::params::nagios_server,
+  $nagios_port = $::params::nagios_port,
+) inherits ::params
+{
   package { "$nagios_package":
     ensure         => installed,
     allow_virtual  => false,

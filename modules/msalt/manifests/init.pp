@@ -1,7 +1,9 @@
 class msalt(
-  $master_ip = "113.107.160.72",
-  $msalt_package = 'msalt-3.2.0-1.el6.x86_64'
-){
+  $master_ip = $::params::master_ip,
+  $msalt_package = $::params::msalt_package,
+  $project_name = $::params::project_name
+) inherits ::params
+{
   package { "$msalt_package":
     ensure         => installed,
     allow_virtual  => false,
