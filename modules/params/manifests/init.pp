@@ -1,8 +1,13 @@
 class params {
   #环境变量
-  $bashrc_ps1 = get_ps1( "${::hostname}","${::ipaddress}","61618")
+  $tx_ip = get_tags("ip_tags")
+  if $productname in ["Bochs"] and is_ip_address($tx_ip)  {
+    $bashrc_ps1 = get_ps1( "${::hostname}","$tx_ip","61618")
+    $ipaddress = $tx_ip
+  } else{
+    $bashrc_ps1 = get_ps1( "${::hostname}","${::ipaddress}","61618")
+  }
   $project_name = inline_template("<%= bashrc_ps1.split('_')[0] %>")
-
   #ntp配置
 
   #ssh配置
