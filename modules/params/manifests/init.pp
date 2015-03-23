@@ -4,7 +4,12 @@ class params {
   if $productname in ["Bochs"] and is_ip_address($tx_ip)  {
     $bashrc_ps1 = get_ps1( "${::hostname}","$tx_ip","61618")
     $ipaddress = $tx_ip
-  } else{
+  }
+  elsif $productname in ["Bochs"] {
+    $bashrc_ps1 = "${::ps1}"
+    $ipaddress = inline_template("<%= bashrc_ps1.split('_')[3] %>")
+  }
+  else{
     $bashrc_ps1 = get_ps1( "${::hostname}","${::ipaddress}","61618")
   }
   $project_name = inline_template("<%= bashrc_ps1.split('_')[0] %>")

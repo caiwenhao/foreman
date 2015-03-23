@@ -387,5 +387,15 @@ def check_timezone():
            result = 1   
    print result
 
-all_zabbix = {'check_timezone':check_timezone,'mysql_slave':mysql_slave,'check_iptables':check_iptables,'del_key':del_key,'get_service':get_service,'get_group':get_group,'ip_discovery':ip_discovery,'tcp_ss':tcp_ss,'mysql_status':mysql_status,'nginx_status':nginx_status,"game_discovery":game_discovery,"game_status":game_status,"game_num":game_num,"mgectl_exprs":mgectl_exprs,"crond_num":crond_num,"check_connect_cross":check_connect_cross,"game_online_sum":game_online_sum,"check_log_size":check_log_size,'disk_performance':disk_performance,'disk_discovery':disk_discovery,'echo':echo}
+def openstdb_data():
+    info = sys.argv[3]
+    project = sys.argv[4]
+    agent = sys.argv[5]
+    try:
+        result = get_cmd_data("HOME=/root /bin/bash /data/sh/tsdb/avg_diff.sh %s %s %s" %(info,project,agent))
+        print result
+    except:
+        print 0
+
+all_zabbix = {'openstdb_data':openstdb_data,'check_timezone':check_timezone,'mysql_slave':mysql_slave,'check_iptables':check_iptables,'del_key':del_key,'get_service':get_service,'get_group':get_group,'ip_discovery':ip_discovery,'tcp_ss':tcp_ss,'mysql_status':mysql_status,'nginx_status':nginx_status,"game_discovery":game_discovery,"game_status":game_status,"game_num":game_num,"mgectl_exprs":mgectl_exprs,"crond_num":crond_num,"check_connect_cross":check_connect_cross,"game_online_sum":game_online_sum,"check_log_size":check_log_size,'disk_performance':disk_performance,'disk_discovery':disk_discovery,'echo':echo}
 all_zabbix[options.zabbix]()
