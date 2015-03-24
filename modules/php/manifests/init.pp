@@ -57,6 +57,12 @@ class php(
     content => "extension = memcached.so\n",
     require => File['/etc/php'],
   }
+  file {"php-fpm":
+    source  => "puppet:///modules/php/php-fpm",
+    path    => "/etc/init.d/php-fpm",
+    mode    => '755',
+    ensure  => file,
+  }
   case $php_enable {
     true: { $ensure = 'running' }
     false: { $ensure = 'stopped' }
@@ -66,7 +72,7 @@ class php(
     enable     => $php_enable,
     hasstatus  => true,
     hasrestart => true,
-    restart => true,
-    require => File["php-fpm.conf","php.ini",'memcached.ini'],
+    restart    => true,
+    require    => File["php-fpm.conf","php.ini",'memcached.ini',"php-fpm"],
   }
 }
