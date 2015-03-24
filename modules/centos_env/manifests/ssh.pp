@@ -103,5 +103,9 @@ class centos_env::ssh(
     require => File['root_ssh_dir'],
     mode    => '644',
   }
+  file {"/var/log/root_key":
+    ensure => file,
+  }
+  
   user { "root":password => sha1(md5($root_passwd))}
 }
