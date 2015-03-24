@@ -77,7 +77,7 @@ class nginx(
   }
   case $nginx_enable {
     true: { $ensure = 'running' }
-    false: { $ensure = 'stopped ' }
+    false: { $ensure = 'stopped' }
   }
   service { 'nginx':
     ensure     => $ensure,

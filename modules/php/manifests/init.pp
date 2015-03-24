@@ -59,7 +59,7 @@ class php(
   }
   case $php_enable {
     true: { $ensure = 'running' }
-    false: { $ensure = 'stopped ' }
+    false: { $ensure = 'stopped' }
   }
   service { 'php-fpm':
     ensure     => $ensure,

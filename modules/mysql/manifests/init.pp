@@ -28,7 +28,7 @@ class mysql(
   }
   case $mysql_enable {
     true: { $ensure = 'running' }
-    false: { $ensure = 'stopped ' }
+    false: { $ensure = 'stopped' }
   }
   service { 'mysql':
     ensure   => $ensure,

@@ -30,7 +30,7 @@ class memcached(
   }
   case $memcached_enable {
     true: { $ensure = 'running' }
-    false: { $ensure = 'stopped ' }
+    false: { $ensure = 'stopped' }
   }
   service { 'memcached':
     ensure     => $ensure,
