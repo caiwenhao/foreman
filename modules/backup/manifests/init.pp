@@ -61,4 +61,10 @@ class backup(
     path    => '/data/backup',
     backup  => false,
   }
+  centos_env::lib::mkdir_p { "/data/logs/backup": }
+  file {"/data/logs/backup":
+    ensure  => directory,
+    require =>  Centos_env::Lib::Mkdir_p["/data/logs/backup"],
+  }
+
 }
