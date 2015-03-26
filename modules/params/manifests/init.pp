@@ -31,8 +31,7 @@ class params {
   $memcached_enable = true
 
   #msalt配置
-  $master_ip = "113.107.160.72"
-  $msalt_package = 'msalt-3.2.0-1.el6.x86_64'
+  include params::msalt
 
   #mysql配置
   $mysql_package = "mysql-5.5.40-1.el6.x86_64"

@@ -1,0 +1,103 @@
+# 主配置
+[main]
+#项目
+project = <%= @project_name %>
+#代理
+agent = <%= @agent %>
+# 角色, 定义的角色必须在下面具有对应的配置
+<% if @bashrc_ps1.include? "admin" -%>
+node_role = admin,server
+<% elsif @bashrc_ps1.include? "router" -%>
+node_role = router,server
+<% else -%>
+node_role = game,gmain,server
+<% end -%>
+# 本机的ip
+node_ip = <%= @node_ip %>
+# 缓存路径
+cache = var/cache
+# 模块路径
+module = module/
+# 文件备份路径
+backup = var/backup
+#copy文件的备份路径
+copy_backup = /data/backup/msalt_copy/
+# plugins路径
+fs_plugin = plugins/fservice
+# grains路径
+grains_dir = msalt/grains/
+
+#pid文件
+pidfile = /var/run/.msalt.pid
+
+#日志定义
+log_file = /data/logs/msalt/msalt.log
+log_level = INFO
+#认证key，数据传输用
+token = <%= @token %>
+#线程数量
+thread_num = 20
+#不能使用正则来匹配节点的cmd，用逗号分隔
+no_regex_cmds = common_tools.change_online_datetime,admin_tools.truncate_admin,common_tools.truncate_game,install_game.do
+#zookeeper任务保存时间
+keep_job_time=2592000
+
+# mgectl不允许执行的危险命令正则列表，以英文,分隔
+mgectl_exclude_command = ^os.cmd
+
+# 保存zookeeper信息到mysql中，排除的cmd，逗号分隔 如：  sys.ping,sys.copy
+zk_history_exclude_cmds=sys.ping
+[zookeeper]
+#zookeepr连接，支持多个，通过逗号分隔
+zk_servers = <%= @zk_servers %>
+
+# zookeeper认证
+zk_scheme = digest
+zk_auth = <%= @zk_auth %>
+
+# 相关目录path
+root=/msalt
+nodes=%(root)s/nodes
+
+# 其他方面的配置
+[others]
+api_token = <%= @api_token %>
+log_url = <%= @log_url %>
+queue_url = <%= @queue_url %>
+
+#如果一台机中有多个同角色但不同代理的节点，用逗号分隔
+###server角色配置
+[server_role]
+node_name = {project}_{agent}_server_{node_ip}
+
+#gmain角色配置
+[gmain_role]
+node_name = {project}_{agent}_gmain_{node_ip}
+
+#game角色配置
+[game_role]
+node_name = @@gen.game
+
+#admin角色配置
+[admin_role]
+node_name = @@gen.admin
+
+#router角色配置
+[router_role]
+node_name = {project}_{agent}_router_{node_ip}
+
+#center角色配置
+[center_role]
+node_name = {project}_{agent}_center_{node_ip}
+
+#central角色配置
+[central_role]
+node_name = {project}_{agent}_central_{node_ip}
+
+#master角色配置
+[master_role]
+node_name = {project}_{agent}_master_{node_ip}
+
+#tole角色配置
+[tlog_role]
+node_name = {project}_{agent}_tlog_{node_ip}

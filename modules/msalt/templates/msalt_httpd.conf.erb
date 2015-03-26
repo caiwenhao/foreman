@@ -1,0 +1,22 @@
+#http配置
+[http]
+#http pid文件
+http_pidfile = /var/run/msalt_http.pid
+#http监听端口
+http_port = 61131
+# http验证key
+http_auth_token = <%= @http_auth_token %>
+# 是否需要验证timestamp超时时间, 1或0
+verify_expire = 1
+# http请求timestamp超时时间，单位：秒
+http_expire_time = 300
+# http日志文件
+http_log_file = /data/logs/msalt/msalt_http.log
+# http日志允许查看的目录列表，以逗号分隔
+http_log_dir_list = /data/logs/,/var/log/
+# http允许查看的日志文件后缀列表，以逗号分隔
+http_log_file_suffix = .log,.message
+# http允许查看的特殊文件名正则列表，以逗号分隔
+http_exp_log_file_regx = ^cron-.*$
+# http 允许的ip列表，以逗分隔
+http_permission_ip = <%= @http_permission_ip %>
