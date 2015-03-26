@@ -124,7 +124,7 @@ class msalt(
   service { 'msalt-common':
     ensure     => $ensure,
     enable     => $msalt_enable,
-    hasstatus  => true,
+    hasstatus  => false,
     hasrestart => true,
     restart    => true,
     require    => File["/etc/msalt",'main.conf'],
@@ -132,7 +132,7 @@ class msalt(
   service { 'msalt-httpd':
     ensure     => $ensure,
     enable     => $msalt_enable,
-    hasstatus  => true,
+    hasstatus  => false,
     hasrestart => true,
     restart    => true,
     require    =>  File["/etc/msalt",'main.conf'],
@@ -144,5 +144,6 @@ class msalt(
     ifempty      => false,
     copytruncate => true,
     create       => true,
+    dateext      => true,
   }
 }
