@@ -1,6 +1,6 @@
 class nginx(
-  $nginx_package = "nginx-1.6.2-1.el6.ngx.x86_64",
-  $nginx_enable = true,
+  $nginx_package =  $::params::nginx_package,
+  $nginx_enable = $::params::nginx_enable,
 ) inherits ::params
 {
   if $operatingsystem in ["CentOS"] {
@@ -86,6 +86,15 @@ class nginx(
     hasrestart => true,
     restart => true,
     require => User['www'],
+  }
+  logrotate::rule { 'nginx':
+    path         => '/data/logs/nginx/*',
+    rotate       => 14,
+    rotate_every => 'daily',
+    ifempty      => false,
+    copytruncate => true,
+    create       => true,
+    dateext      => true,
   }
 
 }
