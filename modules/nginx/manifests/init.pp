@@ -84,14 +84,14 @@ class nginx(
     enable     => $nginx_enable,
     hasstatus  => true,
     hasrestart => true,
-    restart => true,
-    require => User['www'],
+    restart    => true,
+    require    => User['www'],
   }
   logrotate::rule { 'nginx':
-    path         => '/data/logs/nginx/*',
+    path         => '/data/logs/nginx/*.log',
     rotate       => 14,
     rotate_every => 'daily',
-    ifempty      => false,
+    ifempty      => true,
     copytruncate => true,
     create       => true,
     dateext      => true,

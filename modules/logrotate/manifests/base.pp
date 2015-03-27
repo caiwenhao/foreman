@@ -22,6 +22,9 @@ class logrotate::base {
       source  => 'puppet:///modules/logrotate/etc/logrotate.conf';
     '/etc/logrotate.d':
       ensure  => directory,
+      purge => true,
+      force => true,
+      recurse => true,
       mode    => '0755';
     '/etc/cron.daily/logrotate':
       ensure  => file,

@@ -36,4 +36,13 @@ class mysql(
     enable   => $mysql_enable,
     require  => package["$mysql_package"],
   }
+  logrotate::rule { 'mysql':
+    rotate       => 5,
+    path         => "/usr/local/mysql/data/mysqld.log",
+    compress => true,
+    missingok    => true,
+    rotate_every  => 'daily',
+    ifempty      => false,
+    postrotate   => "if test -x /usr/local/mysql/bin/mysqladmin && /usr/local/mysql/bin/mysqladmin ping &>/dev/null \n    then \n     /usr/local/mysql/bin/mysqladmin flush-logs \n    fi",
+  }
 }
