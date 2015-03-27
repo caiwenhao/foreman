@@ -13,6 +13,9 @@ class params {
     $bashrc_ps1 = get_ps1( "${::hostname}","${::ipaddress}","61618")
   }
   $project_name = inline_template("<%= bashrc_ps1.split('_')[0] %>")
+  $role = inline_template("<%= hostname.split('-')[2] %>")
+  $agent = inline_template("<%= hostname.split('-')[1] %>")
+
   #ntp配置
 
   #ssh配置
@@ -64,4 +67,11 @@ class params {
   $zabbix_center ="183.61.135.114,103.5.57.114"
   $listen_port = 30060
   $server_port = 30061
+
+  #tcollector
+  $tcollector_version = "1.0.0-1.el6"
+  $tcollector_server = "115.238.73.221"
+  $tcollector_enable = true
+
+
 }
