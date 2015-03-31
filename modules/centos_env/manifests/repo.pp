@@ -61,7 +61,7 @@ class centos_env::repo(){
   ]
   $performance_tools = [
     "innotop",
-    "iftop",
+    "iftop-1.0pre4-1.x86_64",
     "iotop",
     "lsof",
     "vnstat",
