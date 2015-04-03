@@ -73,5 +73,8 @@ class params {
   $tcollector_server = "115.238.73.221"
   $tcollector_enable = true
 
+  if $role == "activity" {
+    include vsftpd
+  }
 
 }
