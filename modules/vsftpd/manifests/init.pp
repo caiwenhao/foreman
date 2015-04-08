@@ -1,7 +1,7 @@
 class vsftpd (
   $vsftpd_version = "2.2.2-13.el6_6.1",
   $template  = 'vsftpd/vsftpd.conf.erb',
-  $vsftpd_enable = false,
+  $vsftpd_enable = true,
   $vsftpd_port = "11021",
   $vsftpd_user = [{name =>'mingchao_ljxz',passwd=>'n2lsyqt58a514TJT7bBB',path=> "/data/ljxz/web/static/1"},{name =>'mingchao_xlfc',passwd=>'n2lsyqt58a514TJT7bXX',path=> "/data/xlfc_mobile/web/static"}]
 ) {
@@ -60,6 +60,16 @@ class vsftpd (
     hasrestart => true,
     restart    => true,
     require    => File["vsftpd.conf"],
+  }
+  firewall { "$vsftpd_port for vsftpd":
+    action => 'accept',
+    dport  => "$vsftpd_port",
+    proto  => 'tcp',
+  }
+  firewall { "11100:11200 for vsftpd":
+    action => 'accept',
+    dport  => "11100-11200",
+    proto  => 'tcp',
   }
 }
 
