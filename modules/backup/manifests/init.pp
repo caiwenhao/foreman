@@ -1,5 +1,6 @@
 class backup(
   $project_name = $::params::project_name,
+  $backup_dir = $::params::backup_dir
 ) inherits ::params
 {
   centos_env::lib::mkdir_p { "/data/sh/backup": }

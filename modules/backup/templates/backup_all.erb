@@ -26,14 +26,10 @@ BACKUP_ERLANG_DB=1
 
 #服务器配置目录及游戏服配置目录
 DATA_DIR="
-/data/conf
-/data/sh
-/etc/sysconfig/iptables
-/var/spool/cron/root
-/etc/rc.d/rc.local
-/data/${PROJ_NAME}_91wan_1/server
+<% backup_dir.each do |dir| -%>
+<%= dir %>
+<% end -%>
 "
-
 #备份文件目录
 backup_file()
 {

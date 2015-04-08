@@ -73,8 +73,16 @@ class params {
   $tcollector_server = "115.238.73.221"
   $tcollector_enable = true
 
-  if $role == "activity" {
+  #bakcup
+  $common_dir = ["/data/conf","/data/sh","/etc/sysconfig/iptables","/var/spool/cron/root","/etc/rc.d/rc.local","/data/${project_name}_91wan_1/server"]
+
+  if $role == "static" {
     include vsftpd
+    include params::static
+    $backup_dir = concat($common_dir,'/data/ljxz/web/static/1')
+  }
+  else{
+    $backup_dir = $common_dir
   }
 
 }
