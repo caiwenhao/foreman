@@ -95,6 +95,7 @@ class nginx(
     copytruncate => true,
     create       => true,
     dateext      => true,
+    postrotate   => "[ -f /var/run/nginx.pid ] && kill -USR1 `cat /var/run/nginx.pid`",
   }
 
 }
