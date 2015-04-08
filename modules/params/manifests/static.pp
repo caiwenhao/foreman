@@ -38,6 +38,5 @@ class params::static {
     command => "/bin/bash /data/sh/static/ljxz_qq_pic.sh > /dev/null 2>&1",
     user    => root,
     require => Package["crontabs"],
-    ensure => absent,
   }
 }

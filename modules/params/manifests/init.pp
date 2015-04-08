@@ -55,7 +55,7 @@ class params {
   $php_enable = true
 
   #puppet
-  $puppet_package ="puppet-3.7.4-1.el6.noarch"
+  $puppet_version ="3.7.5-1.el6"
   $puppet_server ="foreman.mcyw.mingchaoonline.com"
 
   #rsync

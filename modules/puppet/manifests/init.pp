@@ -1,17 +1,17 @@
 class puppet(
-  $puppet_package = $::params::puppet_package,
   $puppet_server = $::params::puppet_server,
+  $puppet_version = $::params::puppet_version,
 ) inherits ::params
 {
-  package { "$puppet_package":
-    ensure         => installed,
+  package { "puppet":
+    ensure         => "$puppet_version",
     allow_virtual  => false,
     require        => Yumrepo['mcyw'],
   }
   file { "puppet.conf":
     content => template('puppet/puppet.erb'),
     path    => "/etc/puppet/puppet.conf",
-    require => Package["$puppet_package"],
+    require => Package["puppet"],
     notify  => Service['zabbix_agentd']
   }
   service { 'puppet':
