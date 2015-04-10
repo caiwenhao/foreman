@@ -12,5 +12,10 @@ class erlang(
     target => "/usr/local/bin/erl",
     before => Package["$erlang_package"],
   }
+  firewall { "4369 for erlang node":
+    action => 'accept',
+    dport  => "4369",
+    proto  => 'tcp',
+  }
 
 }

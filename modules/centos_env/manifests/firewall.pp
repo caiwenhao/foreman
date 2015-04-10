@@ -22,5 +22,31 @@ class centos_env::firewall(){
     proto   => 'icmp',
     action  => 'accept',
   }
+  firewall { "8000:8300 for game_gateway":
+    action => 'accept',
+    dport  => "8000-8300",
+    proto  => 'tcp',
+  }
+  firewall { "9000:9300 for game_mochiweb":
+    action => 'accept',
+    dport  => "9000-9300",
+    proto  => 'tcp',
+  }
+  firewall { "20000:30000 for mlog":
+    action => 'accept',
+    dport  => "20000-30000",
+    proto  => 'tcp',
+  }
+  firewall { "843 for flash":
+    action => 'accept',
+    dport  => "843",
+    proto  => 'tcp',
+  }
+  firewall { "443 for game":
+    action => 'accept',
+    dport  => "443",
+    proto  => 'tcp',
+  }
+
 }
 
