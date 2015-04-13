@@ -18,5 +18,5 @@ class params::msalt {
 #代理级别参数
   $agent = 'txsj'
 #机器级别参数
-  $msalt_enable = false
+  $msalt_enable = true
 }

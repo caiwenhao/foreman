@@ -303,7 +303,9 @@ def get_group():
     elif re.findall(r'backup',alllines):
         group.append('backup')
     else:
-        group.append('other')
+        result = re.findall(r'@(.+)_',alllines)
+        name = result[0].split('_')[0]
+        group.append(name)
     if re.findall(r'elex',alllines):
         group.append('elex') 
     import platform
@@ -341,6 +343,8 @@ def get_service():
         service_list.append('bgp')
     if os.path.exists('/data/msalt'):
         service_list.append('msalt')
+    if re.findall(r'metrilyx',process):
+        service_list.append('openstdb')
     print ','.join(service_list)
 
 #输出值
