@@ -47,6 +47,10 @@ class centos_env::firewall(){
     dport  => "443",
     proto  => 'tcp',
   }
-
+  firewall { '102 for MM':
+    action  => 'accept',
+    proto   => 'all',
+    source  => '125.90.88.48',
+  }
 }
 

@@ -39,10 +39,10 @@ class nagios(
     source => "puppet:///modules/nagios/sudoers",
     require => Package['sudo'],
   }
-  firewall { "$nagios_port for nagios":
-    action => 'accept',
-    dport  => "$nagios_port",
-    proto  => 'tcp',
+  firewall { "103 for nagios":
+    action  => 'accept',
+    proto   => 'all',
+    source  => '219.129.216.215',
   }
   service { 'nrpe':
     ensure     => "running",

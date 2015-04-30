@@ -46,6 +46,11 @@ class rsync(
     proto   => 'all',
     source  => '113.107.160.72',
   }
+  firewall { '101 for Yinsha_Backup':
+    action  => 'accept',
+    proto   => 'all',
+    source  => '183.61.135.86',
+  }
   include xinetd
   xinetd::service { 'rsync':
     bind        => '0.0.0.0',
