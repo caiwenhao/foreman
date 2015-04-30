@@ -14,12 +14,13 @@ class tcollector(
     require        => Yumrepo['mcyw'],
   }
   file {"/usr/local/tcollector/collectors/0":
-    ensure => directory,
-    force  => true,
-    purge => true,
+    ensure  => directory,
+    force   => true,
+    purge   => true,
     source  => "puppet:///modules/tcollector/0",
     recurse => true,
     require => Package['tcollector'],
+    mode    => '775'
   }
   file { "tsdb_collector":
     content => template('tcollector/tsdb_collector.erb'),

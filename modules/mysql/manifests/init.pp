@@ -1,6 +1,7 @@
 class mysql(
   $mysql_package = $::params::mysql_package,
   $mysql_enable = $::params::mysql_enable,
+  $innodb_buffer_pool_size = inline_template("<%= (@memorysize_mb.to_i*0.4).round %>")
 ) inherits ::params
 {
   file { '/root/mysql_start':
@@ -19,7 +20,8 @@ class mysql(
     content => template('mysql/my.cnf.erb'),
     path    => "/etc/my.cnf",
     mode    => '0644',
-    before => Package["$mysql_package"],
+    before  => Package["$mysql_package"],
+    notify  => Service['mysql'],
   }
   package {$mysql_package:
     ensure         => installed,

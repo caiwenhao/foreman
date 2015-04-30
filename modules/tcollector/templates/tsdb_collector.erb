@@ -23,7 +23,7 @@ exit 5
 fi
 PROJECT=<%= @project_name %>
 AGENT=<%= @agent %>
-ROLE=$(grep node_role /data/msalt/conf/msalt.conf | /bin/grep -Eo 'gmain|admin'); [ "$ROLE" = "" ] && ROLE="other"
+ROLE=$(grep node_role /etc/msalt/msalt.conf | /bin/grep -Eo 'gmain|admin'); [ "$ROLE" = "" ] && ROLE="other"
 PIDFILE=${PIDFILE-'/var/run/tcollector.pid'}
 PROG=$TCOLLECTOR_PATH/tcollector.py
 LOG=${LOG-'/data/logs/tcollector.log'}

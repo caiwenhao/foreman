@@ -1,8 +1,8 @@
 #!/bin/bash
 
-COLLECTORDIR=/usr/local/services/tcollector/collectors/0
-project=$(sed -rn '/server_role/,/project/{/project/{s/project\s*=\s*//;p}}' /data/msalt/conf/msalt.conf)
-roles=$(sed -rn '/node_role/{s/node_role\s*=\s*//;p}' /data/msalt/conf/msalt.conf)
+COLLECTORDIR=/usr/local/tcollector/collectors/0
+project=$(/bin/grep -Po '(?<=^project = )\w+' /etc/msalt/msalt.conf)
+roles=$(sed -rn '/node_role/{s/node_role\s*=\s*//;p}' /etc/msalt/msalt.conf)
 if [[ "${roles}" =~ admin ]]; then 
 	source ${COLLECTORDIR}/lib/mysql_metrics.sh
 	source ${COLLECTORDIR}/lib/mlog_metrics.sh

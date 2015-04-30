@@ -69,6 +69,7 @@ class nginx(
     mode    => '0644',
     require => Package['nginx'],
     before  => Service['nginx'],
+    notify => Service['nginx'],
   }
   firewall { "80 for nginx":
     action => 'accept',

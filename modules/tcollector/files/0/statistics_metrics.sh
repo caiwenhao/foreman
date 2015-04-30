@@ -3,9 +3,9 @@
 # 只用在mm机上运行
 ##################
 
-project=$(sed -rn '/server_role/,/project/{/project/{s/project\s*=\s*//;p;q}}' /data/msalt/conf/msalt.conf)
-agent=$(sed -rn '/server_role/,/agent/{/agent/{s/agent\s*=\s*//;p;q}}' /data/msalt/conf/msalt.conf)
-roles=$(sed -rn '/node_role/{s/node_role\s*=\s*//;p}' /data/msalt/conf/msalt.conf)
+project=$(sed -rn '/server_role/,/project/{/project/{s/project\s*=\s*//;p;q}}' /etc/msalt/msalt.conf)
+agent=$(sed -rn '/server_role/,/agent/{/agent/{s/agent\s*=\s*//;p;q}}' /etc/msalt/msalt.conf)
+roles=$(sed -rn '/node_role/{s/node_role\s*=\s*//;p}' /etc/msalt/msalt.conf)
 while :
 do
 	if [[ "${roles}" =~ master ]]; then
