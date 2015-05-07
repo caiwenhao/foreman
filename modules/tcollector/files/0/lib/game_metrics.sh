@@ -4,7 +4,7 @@ function game_metrics() {
 	
 	project=${1}
 
-	ifdata=$(/usr/local/sbin/iftop -i any -s 10 -t -N -P -B -L 10000 2>/dev/null)
+	ifdata=$(/usr/bin/iftop -i any -s 10 -t -N -P -B -L 10000 2>/dev/null)
 	for game in `ls -d /data/${project}_*_*`
 	do
 		if [ "$(pgrep -f ${game})" != "" ]

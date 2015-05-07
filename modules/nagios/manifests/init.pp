@@ -30,7 +30,15 @@ class nagios(
   file {"/usr/bin/check_nrpe_status":
     ensure => link,
     target => "/usr/local/nagios/bin/check_nrpe_status",
-    before => Package["$nagios_package"],
+    require => Package["$nagios_package"],
+  }
+  file {'check_nrpe_status':
+    path   => '/usr/local/nagios/bin/check_nrpe_status',
+    owner  => "root",
+    group  => "root",
+    mode   => 775,
+    source => "puppet:///modules/nagios/check_nrpe_status",
+    require => Package["$nagios_package"],
   }
   file {'/etc/sudoers':
     owner  => "root",
