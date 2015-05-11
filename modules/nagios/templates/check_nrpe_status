@@ -1,0 +1,237 @@
+#! /bin/bash 
+
+## 脚本用途：方便检测nrpe的各种状态，替代手工查找、粘贴命令的烦琐方式
+## 作者：Jeff Chan   2012-02-08  
+## Version: 1.0   使用位置参数和数组来实现
+## Version: 1.1   使用select函数，外加while做循环，再把多项检测独立出来。  主要精简了代码，降低复杂度
+
+
+## 颜色值说明
+## 使用说明类文本：   红色、绿色、紫色
+## 命令返回的信息：   黄色
+## 命令报错的信息：   蓝色 
+
+## 声明使用方法函数
+
+useage(){
+	echo -e "\033[0;31;1m使用方法，输入选项对应的序号\033[0m"
+	echo -e "\033[0;31;1m	序号	 选项 \033[0m"
+	echo -e "\033[0;31;1m 	1) 	check_disk 	check_disk为nrpe中的模块\033[0m"
+	echo -e "\033[0;32;1m选项说明如下：\033[0m"
+	echo -e "\033[0;35;1m    选项名称		选项类型		选项作用	\033[0m"
+	echo -e "\033[0;36;1m[      模块     ]	普通选项	单独检测数字对应的模块\033[0m"
+	echo -e "\033[0;32;1m[  检查通信状态 ]	特殊选项	检测与服务端通信是否正常\033[0m"
+	echo -e "\033[0;32;1m[ 监控重新加载  ]	特殊选项	监控页面重新加载监测本机\033[0m"
+	echo -e "\033[0;32;1m[    多项检测   ]	特殊选项	一次性检测多个模块\033[0m"
+	echo -e "\033[0;32;1m[    使用说明   ]	特殊选项	打印脚本的使用说明\033[0m"
+	echo -e "\033[0;32;1m[    重启nrpe   ]	特殊选项	重启nrpe服务\033[0m"
+}
+
+## 声明本机的PS1值
+PS_VALUE=`awk -F'[@ ]' '/PS1/ {print $3}' ~/.bashrc`
+
+## 声明PS3的值
+PS3="
+1、每次只能输入一个序号
+2、想要一次性检测多个模块，请选择[ 多项检测 ]选项
+3、快速退出请输入q
+
+请输入：
+" 
+
+## 定义退出脚本时的状态标志位
+declare -i A=1
+
+## 声明select函数列出的菜单内容
+ALL="`awk -F'[][]' '/command\[/ {print $2}' /usr/local/nagios/etc/nrpe.cfg` 检查通信状态 监控页重新加载 多项检测 使用说明 重启nrpe" 
+
+## 数组L为多项测时提供序号与命令的对应关系
+L=(`echo $ALL`)
+
+## 把检查mysql的部分独立出来          使用awk+正则应该可以处理的，但目前自己还未掌握，遂独立出来
+mysql_command(){
+	/usr/local/nagios/libexec/check_mysql_health --socket=/var/lib/mysql/mysql.sock --mode=threads-connected --username=root --password=`cat /data/save/mysql_root` --port 3306 --warning=400 --critical 500
+}
+
+## 远程调用nagios服务器的脚本来执行remote_reload或者remote_check
+remote_command(){
+	ssh -p 61618 219.129.216.215 "/bin/bash /root/nagios_mc/nagios_application.sh ${PS_VALUE} $1"
+}
+
+## 打印模块的详细命令
+detail_command(){
+	echo -e "\033[0;33;1m模块名称：$1\033[0m"	
+	echo -e "\033[0;33;1m详细命令：\033[0m"	
+	grep "\[$1\]=" /usr/local/nagios/etc/nrpe.cfg | awk -F\= '{print $2}'
+}
+
+## 执行模块检测命令
+run_command(){
+	echo -e "\033[0;33;1m执行结果：\033[0m"
+	$(grep "\[$1\]" /usr/local/nagios/etc/nrpe.cfg | awk -F\= '{print $2}')
+        if [[ $1 == 'check_ssh_log' ]]
+        then
+                echo ''
+                echo -e "\033[0;33;1m如果$1服务异常，请执行以下命令再检查之：\033[0m"   
+                echo '/data/sh/mon/ana_ssh_log.py start'
+        fi
+}
+
+## 测试输入的序号是否正确
+test_num(){
+	case $1 in 
+		[0-9]*)
+			if [ $1 -lt 1 -o $1 -gt ${#L[@]} ]     ## 超出序号范围
+			then 
+				echo -e "\033[0;34;1m某个序号超出范围,请重试\033[0m"
+				break
+			fi
+			;;
+		*)						## 当输入非数字的字符时
+			echo -e "\033[0;34;1m输入出错，请输入选项对应的序号。\033[0m"
+			break
+			;;
+	esac
+}					
+
+## 测试多项检测时所有可能的情况
+test_choice(){						## 注意此函数内的break作用
+	case $1 in 
+			重启nrpe)
+				echo " "
+				/root/nrpe restart 
+				/root/nrpe start 
+				break  
+				;;	
+
+                        检查通信状态)
+                                echo " "
+				echo -e "\033[0;33;1m模块名称：$1\033[0m"	
+				remote_command remote_check
+                                echo " "
+                                ;;
+
+                        监控页重新加载)
+                                echo " "
+				echo -e "\033[0;33;1m模块名称：$1\033[0m"	
+                                remote_command remote_reload
+                                echo " "
+                                ;;
+
+                        使用说明)
+                                echo " "
+				echo -e "\033[0;33;1m模块名称：$1\033[0m"	
+                                useage
+                                echo " "
+                                ;;
+
+			多项检测)
+				echo -e "\033[0;33;1m模块名称：$1\033[0m"	
+				echo -e "\033[0;34;1m不能再次进行多项检测，请重试\033[0m"
+				echo " "
+				;;
+
+			*)
+				detail_command $1		## 打印出检测模块的详细命令
+				run_command $1		## 执行模块检测命令
+				echo " "
+				;;
+	esac
+}		
+			
+
+## ——————————————————————————————————————————————  开始执行脚本  ——————————————————————————————————————————————————  ## 
+
+## 打印使用方法
+if [ -z $1 ]
+then
+useage
+
+echo " "
+
+## 列出菜单，并循环执行
+while [ $A -eq 1 ]       ## 当A的值不等于1时，则退出while循环
+do
+	echo -e "\033[0;35;1m菜单详情：\033[0m"
+	select f in $ALL    ##  $ALL为select菜单中所有序号对应的值，$f为你所输入序号对应的值
+	## 使用select函数
+	do 
+	if [[ $REPLY == 'q' ]]             ## 设置快速退出
+	then 
+				echo " "
+				echo -e "\033[0;33;1m感谢使用\033[0m"
+				A=$((A+1))	## 退出脚本（即退出while循环），令标志位的值不为1即可
+				exit 1
+	fi
+
+		case $f in 
+			重启nrpe)
+				echo " "
+				/root/nrpe restart 
+				/root/nrpe start 
+				break  ## 跳出select循环，进入下一轮的while循环
+				;;	
+
+			检查通信状态)
+				echo " "
+				echo -e "\033[0;33;1m模块名称：$f\033[0m"	
+				remote_command remote_check
+				break
+				echo " "
+				;;
+				
+			监控页重新加载)
+				echo " "
+				echo -e "\033[0;33;1m模块名称：$f\033[0m"	
+				remote_command remote_reload
+				break
+				echo " "
+				;;
+
+			使用说明)
+				echo " "
+				useage
+				break 
+				echo " "
+				;;
+			
+			多项检测)		## 当使用多项检测时，你所输入的序号，其调用的是数组L的元素，而不是select菜单中的选项，即不是从$ALL中取值
+				echo " "
+				echo -e "\033[0;35;1m正在使用多项检测模式\033[0m"   ## 记录多项检测时的序号
+				echo -e "\033[0;32;1m请继续输入选项对应的序号，多个序号用空格分开\033[0m"   ## 记录多项检测时的序号
+				read answer
+				echo ""
+				for i in $answer
+				do 
+					test_num $i  				## 检测输入的值是否为数字
+					i=$((i-1))				## L数组中，元素的索引值与实际数字的差值为1
+					test_choice ${L[`echo $i`]}		## 测试输入序号所对应的情况
+				done
+				break
+				;;
+
+			check_mysql)		## 单独处理check_ysql	
+				echo ""
+				mysql_command
+				break 
+				echo ""
+				;;
+			
+				*)		## 单独检测某个模块
+				echo ""
+				if `echo $ALL | grep $f > /dev/null 2>&1`	## 测试你所选择的模块是否在select菜单中		
+				then
+					detail_command $f
+					run_command $f
+					break
+					echo " "
+				else
+					test_num $REPLY
+				fi
+				;;
+		esac
+	done
+	echo " "
+
+done
+fi

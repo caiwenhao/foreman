@@ -1,5 +1,5 @@
 class php(
-  $php_package = $::params::php_package,
+  $php_version = $::params::php_version,
   $libmemcached_package = $::params::libmemcached_package,
   $php_enable = $::params::php_enable,
   $php_com_package = [
@@ -16,6 +16,7 @@ class php(
     "libmcrypt",
     "libmcrypt-devel",
     "libjpeg-turbo",
+    "unixODBC-devel",
   ]
 ) inherits ::params
 {
@@ -24,8 +25,8 @@ class php(
     allow_virtual  => false,
     require        => Yumrepo['mcyw'],
   }
-  package { "$php_package":
-    ensure         => installed,
+  package { "php":
+    ensure         => $php_version,
     allow_virtual  => false,
     require        => Package["$libmemcached_package"],
   }
@@ -42,14 +43,15 @@ class php(
   }
   file {"php-fpm.conf":
     source  => "puppet:///modules/php/php-fpm.conf",
-    require => Package[$php_package,$php_com_package],
+    require => Package["php",$php_com_package],
     path    => '/usr/local/php/etc/php-fpm.conf',
     ensure  => file,
   }
   file {"php.ini":
     source  => "puppet:///modules/php/php.ini",
-    path    => '/etc/php.ini',
+    path => "/etc/php/php.ini",
     ensure  => file,
+    require => File['/etc/php']
   }
   file {'memcached.ini':
     path => '/etc/php/memcached.ini',
@@ -57,6 +59,12 @@ class php(
     content => "extension = memcached.so\n",
     require => File['/etc/php'],
   }
+  file {"/etc/php.ini":
+    ensure => link,
+    target => "/etc/php/php.ini",
+    require => File["/etc/php/php.ini"],
+  }
+
   file {"php-fpm":
     source  => "puppet:///modules/php/php-fpm",
     path    => "/etc/init.d/php-fpm",

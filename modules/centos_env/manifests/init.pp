@@ -5,8 +5,10 @@ class centos_env(
 {
   include 'centos_env::sysctl'
   include 'centos_env::repo'
-  include 'centos_env::firewall'
-  include 'centos_env::ssh'
+  #include 'centos_env::ssh' ->
+  class { '::centos_env::ssh': } ->
+  class { '::centos_env::firewall': }
+  #include 'centos_env::firewall'
 #设置终端环境语言
   augeas {"i18n" :
     context => "/files/etc/sysconfig/i18n",

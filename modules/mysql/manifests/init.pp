@@ -28,6 +28,11 @@ class mysql(
     allow_virtual  => false,
     require        => Yumrepo['mcyw'],
   }
+  file {"/usr/lib64/libperconaserverclient.so.18":
+    ensure => link,
+    target => "/usr/local/mysql/lib/libperconaserverclient.so.18",
+    require => Package["$mysql_package"],
+  }
   case $mysql_enable {
     true: { $ensure = 'running' }
     false: { $ensure = 'stopped' }

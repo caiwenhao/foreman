@@ -50,7 +50,7 @@ class params {
   $nginx_enable = true
 
   #php
-  $php_package = "php-5.4.36-1.el6.x86_64"
+  $php_version = "5.4.36-2.el6"
   $libmemcached_package ="libmemcached-1.0.18-1.el6.x86_64"
   $php_enable = true
 

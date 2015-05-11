@@ -33,11 +33,9 @@ class nagios(
     require => Package["$nagios_package"],
   }
   file {'check_nrpe_status':
-    path   => '/usr/local/nagios/bin/check_nrpe_status',
-    owner  => "root",
-    group  => "root",
-    mode   => 775,
-    source => "puppet:///modules/nagios/check_nrpe_status",
+    path    => '/usr/local/nagios/bin/check_nrpe_status',
+    content => template('nagios/check_nrpe_status'),
+    mode    => 775,
     require => Package["$nagios_package"],
   }
   file {'/etc/sudoers':
