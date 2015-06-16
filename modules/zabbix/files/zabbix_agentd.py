@@ -25,7 +25,10 @@ def get_cmd_data(cmd):
 def ip_discovery():
     ip_list = []
     all_ip = get_cmd_data("/sbin/ifconfig |awk -F\: '/inet addr/ {print $2}'|awk '{print $1}'").split()
+    wan_ip = get_cmd_data('/bin/grep -o -E "[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}" /root/.bashrc')
     all_ip.remove('127.0.0.1')
+    all_ip.append(wan_ip)
+    all_ip = list(set(all_ip))
     import platform
     if platform.platform().find('tlinux') != -1 and len(all_ip) > 1:
         for ip in all_ip and len:

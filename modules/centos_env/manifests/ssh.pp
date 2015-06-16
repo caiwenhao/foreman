@@ -32,9 +32,9 @@ class centos_env::ssh(
       $ssh_config_forward_x11_trusted  = 'yes'
       $sshd_config_mode                = '0600'
       $sshd_config_use_dns             = 'yes'
-      $sshd_config_xauth_location      = '/usr/bin/xauth'
-      $sshd_use_pam                    = 'yes'
-      $sshd_gssapikeyexchange          = undef
+      $sshd_config_xauth_location     = '/usr/bin/xauth'
+      $sshd_use_pam                     = 'yes'
+      $sshd_gssapikeyexchange         = undef
       $sshd_pamauthenticationviakbdint = undef
       $sshd_gssapicleanupcredentials   = 'yes'
       $sshd_acceptenv                  = true
@@ -66,13 +66,13 @@ class centos_env::ssh(
     require => File["/dist/dist/${sshd_packages}.rpm"],
   }
   augeas  { 'ssh_config' :
-    context => "/files",
-    changes => 'set /etc/ssh/ssh_config/Host/StrictHostKeyChecking "yes"',
+    context => "/files/etc/ssh/ssh_config/Host/",
+    changes =>['set StrictHostKeyChecking no','set ForwardAgent yes','set Port 61618'],
     require => Package[$packages],
   }
   augeas  { 'sshd_config' :
     context => "/files/etc/ssh/sshd_config",
-    changes => ["set Port ${ssh_port}","set PasswordAuthentication  no","set UseDNS no","set AddressFamily inet","set LogLevel DEBUG"],
+    changes => ["set Port ${ssh_port}","set PasswordAuthentication  no","set UseDNS yes","set AddressFamily inet","set LogLevel DEBUG"],
     require => Package[$packages],
     notify => Service["sshd_service"],
   }

@@ -23,6 +23,16 @@ class mysql(
     before  => Package["$mysql_package"],
     notify  => Service['mysql'],
   }
+  file {'/data/save':
+    ensure => directory,
+    mode => 775,
+    require => Package["$mysql_package"],
+  }
+  file {'/data/save/mysql_root':
+    ensure => file,
+    mode => 644,
+    require => File['/data/save']
+  }
   package {$mysql_package:
     ensure         => installed,
     allow_virtual  => false,
@@ -32,6 +42,11 @@ class mysql(
     ensure => link,
     target => "/usr/local/mysql/lib/libperconaserverclient.so.18",
     require => Package["$mysql_package"],
+  }
+  centos_env::lib::mkdir_p { "/data/logs/mysql": }
+  file {"/data/logs/mysql":
+    ensure  => directory,
+    require =>  Centos_env::Lib::Mkdir_p["/data/logs/mysql"],
   }
   case $mysql_enable {
     true: { $ensure = 'running' }
@@ -45,11 +60,12 @@ class mysql(
   }
   logrotate::rule { 'mysql':
     rotate       => 5,
-    path         => "/usr/local/mysql/data/mysqld.log",
-    compress => true,
+    path         => "/data/logs/mysqld.log",
+    compress     => true,
     missingok    => true,
-    rotate_every  => 'daily',
+    rotate_every => 'daily',
     ifempty      => false,
+    olddir       => '/data/logs/mysql',
     postrotate   => "if test -x /usr/local/mysql/bin/mysqladmin && /usr/local/mysql/bin/mysqladmin ping &>/dev/null \n    then \n     /usr/local/mysql/bin/mysqladmin flush-logs \n    fi",
   }
 }

@@ -1,10 +1,14 @@
 class nagios(
-  $nagios_package = $::params::nagios_package,
+  $nagios_package = ["nagios-plugins","nrpe","nrpe-plugin"],
   $nagios_server =$::params::nagios_server,
   $nagios_port = $::params::nagios_port,
 ) inherits ::params
 {
-  package { "$nagios_package":
+  package {'nagios':
+    ensure => absent,
+    allow_virtual  => false,
+  }->
+  package { $nagios_package:
     ensure         => installed,
     allow_virtual  => false,
     require        => Yumrepo['mcyw'],
@@ -24,19 +28,18 @@ class nagios(
   file { "nrpe.cfg":
     content => template('nagios/nrpe.erb'),
     path    => "/usr/local/nagios/etc/nrpe.cfg",
-    require => Package["$nagios_package"],
-    notify  => Service['nrpe'],
+    require => Package[$nagios_package],
   }
-  file {"/usr/bin/check_nrpe_status":
+  file {'/etc/nagios/nrpe.cfg':
     ensure => link,
-    target => "/usr/local/nagios/bin/check_nrpe_status",
-    require => Package["$nagios_package"],
+    target => "/usr/local/nagios/etc/nrpe.cfg",
+    require => File['nrpe.cfg'],
   }
   file {'check_nrpe_status':
-    path    => '/usr/local/nagios/bin/check_nrpe_status',
+    path    => '/usr/bin/check_nrpe_status',
     content => template('nagios/check_nrpe_status'),
     mode    => 775,
-    require => Package["$nagios_package"],
+    require => Package[$nagios_package],
   }
   file {'/etc/sudoers':
     owner  => "root",
@@ -50,12 +53,19 @@ class nagios(
     proto   => 'all',
     source  => '219.129.216.215',
   }
-  service { 'nrpe':
-    ensure     => "running",
-    enable     => true,
-    hasstatus  => true,
-    hasrestart => true,
-    require    => File['nrpe.cfg'],
-    path       => "/etc/init.d",
+  include xinetd
+  xinetd::service { 'nrpe':
+    bind        => '0.0.0.0',
+    flags       => 'REUSE',
+    socket_type => 'stream',
+    wait        => 'wait',
+    user        => 'nagios',
+    group       => 'nagios',
+    port        => '5666',
+    server      => '/usr/sbin/nrpe',
+    server_args => "-c /usr/local/nagios/etc/nrpe.cfg --inetd",
+    disable     => 'no',
+    only_from   => "127.0.0.1 $nagios_server",
+    require     => Package[$nagios_package],
   }
 }

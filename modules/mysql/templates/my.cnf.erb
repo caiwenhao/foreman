@@ -24,7 +24,7 @@ basedir = /usr/local/mysql
 datadir = /usr/local/mysql/var
 pid-file = /var/lib/mysql/mysqld.pid
 socket = /var/lib/mysql/mysql.sock
-log-error = /usr/local/mysql/data/mysqld.log
+log-error = /data/logs/mysqld.log
 tmpdir = /tmp
 open_files_limit = 65535
 bind-address = 0.0.0.0
@@ -77,7 +77,7 @@ myisam_repair_threads = 1
 bulk_insert_buffer_size =16M
 
 [mysqld_safe]
-err-log = /usr/local/mysql/data/mysqld.log
+err-log = /data/logs/mysqld.log
 nice = 0
 socket = /var/lib/mysql/mysql.sock
 
